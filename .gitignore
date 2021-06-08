@@ -1,0 +1,5 @@
+.idea
+example/log/*
+glory-k8s-client
+glory-k8s-server
+*.exe
