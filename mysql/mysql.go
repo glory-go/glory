@@ -22,7 +22,7 @@ func (mh *MysqlHandler) setup(conf map[string]*config.MysqlConfig) {
 	for k, v := range conf {
 		tempService := newMysqlService()
 		if err := tempService.openDB(*v); err != nil {
-			log.Error("opendb with key = ", k, "err")
+			log.Errorf("opendb with key = %s, err = %s", k, err)
 			continue
 		}
 		mh.mysqlServices[k] = tempService
@@ -38,8 +38,8 @@ func newMysqlHandler() *MysqlHandler {
 func RegisterModel(mysqlServiceName string, model UserDefinedModel) (*MysqlTable, error) {
 	service, ok := defaultMysqlHandler.mysqlServices[mysqlServiceName]
 	if !ok {
-		log.Error("mysql service name = ", mysqlServiceName, " not registered in config")
-		return nil, errors.New("mysql service name = " + mysqlServiceName + " not registered in config")
+		log.Error("mysql service name = ", mysqlServiceName, " not setup successful")
+		return nil, errors.New("mysql service name = " + mysqlServiceName + " not setup successful")
 	}
 	return service.registerModel(model)
 }

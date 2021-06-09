@@ -10,7 +10,7 @@ import (
 
 func init() {
 	defaultRabbitMQHandler = newRabbitMQDefaultHandler()
-	defaultRabbitMQHandler.setup(config.GlobalServerConf.RabbitMQConfig)
+	defaultRabbitMQHandler.setup(config.GlobalServerConf.MQConfig)
 }
 
 type RabbitMQHandler struct {
@@ -24,7 +24,7 @@ func (mh *RabbitMQHandler) setup(conf map[string]*config.MQConfig) {
 		tempService := newRabbitMQService()
 		tempService.loadConfig(*v)
 		if err := tempService.connect(); err != nil {
-			log.Error("opendb with key = ", k, "err")
+			log.Error("opendb with key = ", k, " error = ", err)
 			continue
 		}
 		mh.mqServicesMap[k] = tempService
@@ -40,8 +40,8 @@ func newRabbitMQDefaultHandler() *RabbitMQHandler {
 func NewRabbitMQClient(rbmqServiceName string) (*amqp.Connection, error) {
 	service, ok := defaultRabbitMQHandler.mqServicesMap[rbmqServiceName]
 	if !ok {
-		log.Error("rabbitmq service name = ", rbmqServiceName, "not registered in config")
-		return nil, errors.New("rabbitmq service name = " + rbmqServiceName + "not registered in config")
+		log.Error("rabbitmq service name = ", rbmqServiceName, " not registered in config")
+		return nil, errors.New("rabbitmq service name = " + rbmqServiceName + " not registered in config")
 	}
 	return service.conn, nil
 }
@@ -51,12 +51,11 @@ func GetService(rbmqServiceName string) (*RabbitMQService, bool) {
 	return s, ok
 }
 
-
 func StartOnMQMsgHandler(rbmqServiceName, channelName string, hanlder MQMsgHandler) error {
 	service, ok := defaultRabbitMQHandler.mqServicesMap[rbmqServiceName]
 	if !ok {
-		log.Error("rabbitmq service name = ", rbmqServiceName, "not registered in config")
-		return errors.New("rabbitmq service name = " + rbmqServiceName + "not registered in config")
+		log.Error("rabbitmq service name = ", rbmqServiceName, " not registered in config")
+		return errors.New("rabbitmq service name = " + rbmqServiceName + " not registered in config")
 	}
 	if err := service.startOnMsgHandler(channelName, hanlder); err != nil {
 		log.Error("rabbitmq service send to ", channelName, " queue err = ", err)

@@ -11,15 +11,57 @@ type RspPackage interface {
 	SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode)         // 错误回包
 }
 
-// DefaultFomattedRspPackage
-// 框架提供的默认格式化回包，包含三个字段,与下面的 DefaultRspPackage 选择使用
-type DefaultFomattedRspPackage struct {
+type RspPackageFactory func()RspPackage
+
+type DefaultRspPackage struct {
+
+}
+
+func NewDefaultRspPackage()RspPackage{
+	return &DefaultRspPackage{}
+}
+
+
+func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
+	if retCode == UnsetHttpCode {
+		retCode = DefaultHttpSuccessCode
+	}
+	w.WriteHeader(int(retCode))
+	var err error
+	rpkgBody := make([]byte, 0)
+	if rpkgBody, err = json.Marshal(result); err != nil {
+		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
+		return
+	}
+	_, _ = w.Write(rpkgBody)
+}
+
+func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
+	if retCode == UnsetHttpCode {
+		retCode = DefaultHttpSuccessCode
+	}
+	w.WriteHeader(int(retCode))
+	rpkgBody := make([]byte, 0)
+	if rpkgBody, err = json.Marshal(err.Error()); err != nil {
+		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
+		return
+	}
+	_, _ = w.Write(rpkgBody)
+}
+
+
+// FomattedRspPackage
+// 框架提供的格式化回包，包含三个字段,与下面的 DefaultRspPackage 选择使用
+type FomattedRspPackage struct {
 	Retcode int32       `json:"retcode"`
 	Retmsg  string      `json:"retmsg"`
 	Result  interface{} `json:"result"`
 }
+func NewFomattedRspPackage()RspPackage{
+	return &FomattedRspPackage{}
+}
 
-func (rpkg *DefaultFomattedRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
+func (rpkg *FomattedRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
 	rpkg.Retmsg = "ok"
 	rpkg.Retcode = 0
 	rpkg.Result = result
@@ -36,7 +78,7 @@ func (rpkg *DefaultFomattedRspPackage) SetSuccessPkg(w http.ResponseWriter, resu
 	_, _ = w.Write(rpkgBody)
 }
 
-func (rpkg *DefaultFomattedRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
+func (rpkg *FomattedRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
 	rpkg.Retmsg = err.Error()
 	rpkg.Retcode = -1
 	rpkg.Result = nil
@@ -54,14 +96,17 @@ func (rpkg *DefaultFomattedRspPackage) SetErrorPkg(w http.ResponseWriter, err er
 
 //
 
-// DefaultRspPackage
-// 框架提供的默认空回包，包含一个字段
-type DefaultRspPackage struct {
+// ResultAndOKRspPackage contains ok and result
+type ResultAndOKRspPackage struct {
 	Result interface{} `json:"result"`
 	OK     bool        `json:"ok"`
 }
 
-func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
+func NewResultAndOKRspPackage()RspPackage{
+	return &ResultAndOKRspPackage{}
+}
+
+func (rpkg *ResultAndOKRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
 	rpkg.Result = result
 	rpkg.OK = true
 	if retCode == UnsetHttpCode {
@@ -77,7 +122,7 @@ func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result inter
 	_, _ = w.Write(rpkgBody)
 }
 
-func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
+func (rpkg *ResultAndOKRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
 	rpkg.Result = err.Error()
 	rpkg.OK = false
 	if retCode == UnsetHttpCode {

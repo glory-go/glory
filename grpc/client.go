@@ -21,7 +21,6 @@ type GrpcClient struct {
 
 func (gc *GrpcClient) setTargetAddr(address *common.Address) {
 	gc.targetAddress = address
-	log.Info("set grpc client target addr = ", *gc.targetAddress)
 }
 
 func (gc *GrpcClient) setTargetServerID(serverID string) {
@@ -106,7 +105,7 @@ func NewGrpcClient(grpcClientName string) *GrpcClient {
 	return grpcClient
 }
 
-func NewGrpcClientWithDynamicAddr(grpcClientName string, addr string) *GrpcClient{
+func NewGrpcClientWithDynamicAddr(grpcClientName string, addr string) *GrpcClient {
 	gloryClientConfig, ok := config.GlobalServerConf.ClientConfig[grpcClientName]
 	if !ok {
 		panic("glory serviceName " + grpcClientName + " in your source code not found in config file!")

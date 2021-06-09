@@ -14,8 +14,8 @@ import (
 
 const (
 	NacosTimeoutMs        = 5000
-	NacosLogDir           = "/tmp/nacos/log"
-	NacosCacheDir         = "/tmp/nacos/cache"
+	NacosLogDir           = "."
+	NacosCacheDir         = "."
 	NacosRotateTime       = "1h"
 	GloryNacosNamespaceID = "glory"
 	NacosLogLevel         = "debug"
@@ -64,11 +64,13 @@ func newNacosRegistry(registryConfig *config.RegistryConfig) registry.Registry {
 
 // Subscribe is undefined
 func (nr *nacosRegistry) Subscribe(key string) (chan common.RegistryChangeEvent, error) {
+	// todo
 	return nil, nil
 }
 
 // Unsubscribe is undefined
 func (nr *nacosRegistry) Unsubscribe(key string) error {
+	// todo
 	return nil
 }
 
@@ -82,10 +84,10 @@ func (nr *nacosRegistry) Register(serviceID string, localAddress common.Address)
 		Healthy:     true,
 		Ephemeral:   true,
 	}); err != nil || !ok {
-		log.Error("nacos register with serviceID = ", serviceID, " local address = ", localAddress, "register error = ", err)
+		log.Error("nacos register with serviceID = ", serviceID, " local address = ", localAddress, " register error = ", err)
 		return
 	}
-	log.Debug("nacos register success, with serviceID = ", serviceID, "localAddr = ", localAddress)
+	log.Debug("nacos register success, with serviceID = ", serviceID, " localAddr = ", localAddress)
 }
 
 func (nr *nacosRegistry) UnRegister(serviceID string, localAddress common.Address) {

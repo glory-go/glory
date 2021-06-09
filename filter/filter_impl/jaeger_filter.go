@@ -37,7 +37,13 @@ func NewJaegerFilter(filterConfig *config.FilterConfig) (filter.GRPCFilter, erro
 		log.Errorf("ERROR: fail to setup Jaeger:%v\n", err)
 		return nil, err
 	}
-	jaegerFilter.tracer, _, err = jaegerFilter.newJaegerTracer(conf)
+	if filterConfig.JaegerType == "alicloud" {
+		jaegerFilter.tracer, _, err = jaegerFilter.newJaegerTracer(conf)
+	} else {
+		jaegerFilter.tracer, _, err = conf.NewTracer(
+			jaegercfg.Logger(jaeger.StdLogger),
+			jaegercfg.Sampler(jaeger.NewConstSampler(true)))
+	}
 	if err != nil {
 		log.Errorf("ERROR: fail to init Jaeger:%v\n", err)
 		return nil, err
@@ -148,7 +154,7 @@ func (j *JaegerFilter) setup(conf *config.FilterConfig) (*jaegercfg.Configuratio
 		},
 
 		Reporter: &jaegercfg.ReporterConfig{
-			LogSpans:           false,
+			LogSpans:           true,
 			LocalAgentHostPort: conf.Address,
 		},
 

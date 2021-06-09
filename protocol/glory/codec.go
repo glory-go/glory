@@ -18,8 +18,8 @@
 package glory
 
 import (
-	"github.com/glory-go/glory/log"
 	hessian "github.com/apache/dubbo-go-hessian2"
+	"github.com/glory-go/glory/log"
 )
 
 func NewGloryPkgHandler() *GloryPkgHandler {

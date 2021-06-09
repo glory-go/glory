@@ -260,7 +260,7 @@ func (l *Logger) ctxWarnf(ctx context.Context, template string, arg ...interface
 }
 
 func (l *Logger) errorf(template string, arg ...interface{}) {
-	arg = append(arg, zap.StackSkip("stack", 2).String)
+	arg = append(arg, "\n"+zap.StackSkip("stack", 2).String)
 	template += "\n%s\n"
 	for _, v := range l.logger {
 		v.Errorf(template, arg...)
@@ -348,7 +348,7 @@ func (l *Logger) ctxWarn(ctx context.Context, arg ...interface{}) {
 }
 
 func (l *Logger) error(arg ...interface{}) {
-	arg = append(arg, zap.StackSkip("stack", 2).String)
+	arg = append(arg, "\n"+zap.StackSkip("stack", 2).String)
 
 	for _, v := range l.logger {
 		v.Error(arg...)
@@ -356,6 +356,7 @@ func (l *Logger) error(arg ...interface{}) {
 }
 func (l *Logger) ctxError(ctx context.Context, arg ...interface{}) {
 	traceID, ok := getTraceIDFromUberCtx(ctx)
+	arg = append(arg, "\n"+zap.StackSkip("stack", 2).String)
 	if !ok {
 		l.error(arg...)
 		return

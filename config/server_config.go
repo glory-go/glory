@@ -25,8 +25,8 @@ type ServerConfig struct {
 	RedisConfig map[string]*RedisConfig `yaml:"redis"`
 	// K8SConfig K8s配置
 	K8SConfig map[string]*K8SConfig `yaml:"k8s"`
-	// RabbitMQConfig RabbitMQ配置
-	RabbitMQConfig map[string]*MQConfig `yaml:"rabbitmq"`
+	// MQConfig MQ配置
+	MQConfig map[string]*MQConfig `yaml:"mq"`
 	// OssConfigs 持久云存储配置
 	OssConfigs map[string]*OssConfig `yaml:"oss"`
 	// MongoDBConfig Mongo 数据库配置
@@ -117,7 +117,7 @@ func NewServerConfig() *ServerConfig {
 		MysqlConfigs:   make(map[string]*MysqlConfig),
 		K8SConfig:      make(map[string]*K8SConfig),
 		RedisConfig:    make(map[string]*RedisConfig),
-		RabbitMQConfig: map[string]*MQConfig{},
+		MQConfig:       map[string]*MQConfig{},
 		OssConfigs:     make(map[string]*OssConfig),
 		ClientConfig:   make(map[string]*ClientConfig),
 	}

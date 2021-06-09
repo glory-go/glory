@@ -3,8 +3,8 @@ package metrics
 import (
 	"net/http"
 
-	"github.com/glory-go/glory/tools"
 	gxnet "github.com/dubbogo/gost/net"
+	"github.com/glory-go/glory/tools"
 
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"

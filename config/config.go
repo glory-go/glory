@@ -127,13 +127,12 @@ func init() {
 	// no config file
 }
 
-
-func loadDefaultConfig(){
+func loadDefaultConfig() {
 	defaultSrvConf := &ServerConfig{
 		LogConfigs: make(map[string]*LogConfig),
 	}
 	defaultSrvConf.LogConfigs["default-log"] = &LogConfig{
-		LogType: "console",
+		LogType:  "console",
 		LogLevel: "debug",
 	}
 	defaultSrvConf.OrgName = "default_org"

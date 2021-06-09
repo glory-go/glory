@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/glory-go/glory/config"
 	mq_http_sdk "github.com/aliyunmq/mq-http-go-sdk"
+	"github.com/glory-go/glory/config"
 	"github.com/gogap/errors"
 )
 

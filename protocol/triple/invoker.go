@@ -22,11 +22,11 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/glory-go/glory/common"
-	"github.com/glory-go/glory/config"
 	dubboCommon "github.com/apache/dubbo-go/common"
 	"github.com/apache/dubbo-go/protocol/dubbo/hessian2"
 	dubbo3 "github.com/dubbogo/triple/pkg/triple"
+	"github.com/glory-go/glory/common"
+	"github.com/glory-go/glory/config"
 )
 
 type Invoker struct {

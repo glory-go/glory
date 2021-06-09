@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/glory-go/glory/config"
 	sls "github.com/aliyun/aliyun-log-go-sdk"
+	"github.com/glory-go/glory/config"
 	"github.com/gogo/protobuf/proto"
 	"go.uber.org/zap/zapcore"
 )

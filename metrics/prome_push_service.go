@@ -1,10 +1,10 @@
 package metrics
 
 import (
+	gxnet "github.com/dubbogo/gost/net"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/tools"
-	gxnet "github.com/dubbogo/gost/net"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/push"
 )

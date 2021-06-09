@@ -21,15 +21,15 @@ import (
 	"context"
 	"reflect"
 
-	"github.com/glory-go/glory/config"
 	dubboCommon "github.com/apache/dubbo-go/common"
 	dubbo3 "github.com/dubbogo/triple/pkg/triple"
+	"github.com/glory-go/glory/config"
 
 	"github.com/glory-go/glory/plugin"
 
+	dubboProto "github.com/apache/dubbo-go/protocol"
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/protocol"
-	dubboProto "github.com/apache/dubbo-go/protocol"
 )
 
 func init() {

@@ -15,6 +15,7 @@ type FilterConfig struct {
 	SubFiltersKey []string `yaml:"sub_filters"`
 
 	// jaeger filter config
+	JaegerType   string  `yaml:"jaeger_type"` // self (default 自建jaeger) or alicloud(阿里云jaeger服务)
 	SamplerType  string  `yaml:"jaeger_config_type"`
 	SamplerParam float64 `yaml:"jaeger_config_param"`
 	Address      string  `yaml:"jaeger_address"`

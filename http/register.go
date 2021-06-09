@@ -13,11 +13,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var rspImpPackage RspPackage
+var rspImpPackage RspPackageFactory
 
 func init() {
 	// 框架默认使用default空回包
-	rspImpPackage = &DefaultRspPackage{}
+	RegisterRspPackage(NewDefaultRspPackage)
 }
 
 // 添加默认的 header
@@ -39,7 +39,7 @@ func writeDefaultHeader(rsp http.ResponseWriter, req *http.Request) {
 func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp interface{}, filters []Filter) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		retPkg := rspImpPackage
+		retPkg := rspImpPackage()
 
 		// recovery
 		defer func() {
@@ -102,7 +102,7 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		retPkg := rspImpPackage
+		retPkg := rspImpPackage()
 
 		// recovery
 		defer func() {
@@ -128,8 +128,8 @@ func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.Respons
 }
 
 // 自定义回包函数
-func RegisterRspPackage(rspUserImpPackage RspPackage) {
-	rspImpPackage = rspUserImpPackage
+func RegisterRspPackage(rspUserImplPackageFactory RspPackageFactory) {
+	rspImpPackage = rspUserImplPackageFactory
 }
 
 func checkMethod(method string) (string, bool) {
