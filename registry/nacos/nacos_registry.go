@@ -1,6 +1,7 @@
 package nacos
 
 import (
+	"fmt"
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
@@ -9,7 +10,9 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/nacos-group/nacos-sdk-go/vo"
+	"strconv"
 )
 
 const (
@@ -64,8 +67,24 @@ func newNacosRegistry(registryConfig *config.RegistryConfig) registry.Registry {
 
 // Subscribe is undefined
 func (nr *nacosRegistry) Subscribe(key string) (chan common.RegistryChangeEvent, error) {
-	// todo
-	return nil, nil
+	ch := make(chan common.RegistryChangeEvent)
+	if err := nr.client.Subscribe(&vo.SubscribeParam{
+		ServiceName: key,
+		SubscribeCallback: func(services []model.SubscribeService, err error) {
+			go func() {
+				fmt.Println("subscribe get services = ", services)
+				addrList := make([]common.Address, 0)
+				for _, v := range services {
+					addrList = append(addrList, *common.NewAddress(v.Ip + ":" + strconv.Itoa(int(v.Port))))
+				}
+				ch <- *common.NewReigstryUpdateToServiceEvent(addrList)
+			}()
+		},
+	}); err != nil {
+		log.Error("nacos registry subscribe with key = ", key, " error = ", err)
+		return ch, err
+	}
+	return ch, nil
 }
 
 // Unsubscribe is undefined
@@ -75,6 +94,7 @@ func (nr *nacosRegistry) Unsubscribe(key string) error {
 }
 
 func (nr *nacosRegistry) Register(serviceID string, localAddress common.Address) {
+	md := make(map[string]string)
 	if ok, err := nr.client.RegisterInstance(vo.RegisterInstanceParam{
 		Ip:          localAddress.Host,
 		Port:        uint64(localAddress.Port),
@@ -83,6 +103,7 @@ func (nr *nacosRegistry) Register(serviceID string, localAddress common.Address)
 		Enable:      true,
 		Healthy:     true,
 		Ephemeral:   true,
+		Metadata:    md,
 	}); err != nil || !ok {
 		log.Error("nacos register with serviceID = ", serviceID, " local address = ", localAddress, " register error = ", err)
 		return
@@ -100,7 +121,7 @@ func (nr *nacosRegistry) UnRegister(serviceID string, localAddress common.Addres
 		log.Error("nacos unRegister with serviceID = ", serviceID, " local address = ", localAddress, "register error = ", err)
 		return
 	}
-	log.Debug("nacos Unregister success, with serviceID = ", serviceID)
+	log.Debug("nacos Unregister success, with serviceID = ", serviceID, "local address = ", localAddress)
 }
 
 func (nr *nacosRegistry) Refer(key string) []common.Address {

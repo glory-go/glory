@@ -11,16 +11,14 @@ type RspPackage interface {
 	SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode)         // 错误回包
 }
 
-type RspPackageFactory func()RspPackage
+type RspPackageFactory func() RspPackage
 
 type DefaultRspPackage struct {
-
 }
 
-func NewDefaultRspPackage()RspPackage{
+func NewDefaultRspPackage() RspPackage {
 	return &DefaultRspPackage{}
 }
-
 
 func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result interface{}, retCode httpCode) {
 	if retCode == UnsetHttpCode {
@@ -49,7 +47,6 @@ func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, ret
 	_, _ = w.Write(rpkgBody)
 }
 
-
 // FomattedRspPackage
 // 框架提供的格式化回包，包含三个字段,与下面的 DefaultRspPackage 选择使用
 type FomattedRspPackage struct {
@@ -57,7 +54,8 @@ type FomattedRspPackage struct {
 	Retmsg  string      `json:"retmsg"`
 	Result  interface{} `json:"result"`
 }
-func NewFomattedRspPackage()RspPackage{
+
+func NewFomattedRspPackage() RspPackage {
 	return &FomattedRspPackage{}
 }
 
@@ -102,7 +100,7 @@ type ResultAndOKRspPackage struct {
 	OK     bool        `json:"ok"`
 }
 
-func NewResultAndOKRspPackage()RspPackage{
+func NewResultAndOKRspPackage() RspPackage {
 	return &ResultAndOKRspPackage{}
 }
 

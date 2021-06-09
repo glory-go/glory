@@ -5,7 +5,7 @@ import (
 	"github.com/glory-go/glory/config"
 	_ "github.com/glory-go/glory/filter/filter_impl"
 	"github.com/glory-go/glory/filter/intercepter_impl"
-	"github.com/glory-go/glory/grpc/resolver"
+	_ "github.com/glory-go/glory/grpc/resolver"
 	"github.com/glory-go/glory/log"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/balancer/roundrobin"
@@ -31,6 +31,7 @@ func (gc *GrpcClient) setSchema(schema string) {
 	gc.schema = schema
 }
 
+
 func (gc *GrpcClient) setClientName(clientName string) {
 	gc.clientName = clientName
 }
@@ -46,12 +47,8 @@ func (gc *GrpcClient) setup(filtersKey []string) {
 		gc.conn, err = grpc.Dial(gc.targetAddress.GetUrl(), dialOption...)
 	} else {
 		dialOption = addDialOptionsWithLoadBalancer(dialOption)
-		if gc.schema == "k8s" {
-			dialOption = addDialOptionsWithK8SResolver(dialOption)
-			gc.conn, err = grpc.Dial("k8s:///"+gc.clientName, dialOption...)
-		} else {
-			gc.conn, err = grpc.Dial(gc.clientName, dialOption...)
-		}
+		dialOption = addDialOptionsWithSchemaResolver(dialOption, gc.schema)
+		gc.conn, err = grpc.Dial(gc.schema + ":///"+gc.clientName, dialOption...)
 	}
 	if err != nil {
 		log.Error(err)
@@ -77,9 +74,9 @@ func addDialOptionsWithLoadBalancer(opts []grpc.DialOption) []grpc.DialOption {
 	return append(opts, grpc.WithDefaultServiceConfig(`{"LoadBalancingPolicy": "round_robin"}`)) //,
 }
 
-//addDialOptionsWithK8SResolver 增加对应的DialOption
-func addDialOptionsWithK8SResolver(opts []grpc.DialOption) []grpc.DialOption {
-	return append(opts, grpc.WithResolvers(resolver.NewK8SResolverBuilder())) //,
+//addDialOptionsWithSchemaResolver 增加对应的DialOption
+func addDialOptionsWithSchemaResolver(opts []grpc.DialOption, schema string) []grpc.DialOption {
+	return append(opts, grpc.WithResolvers(NewResolverBuilder(schema))) //,
 }
 
 func NewGrpcClient(grpcClientName string) *GrpcClient {
@@ -97,9 +94,7 @@ func NewGrpcClient(grpcClientName string) *GrpcClient {
 	}
 	grpcClient.setTargetServerID(gloryClientConfig.ServiceID)
 	if regConf, ok := config.GlobalServerConf.RegistryConfig[gloryClientConfig.RegistryKey]; ok {
-		if regConf.Service == "k8s" {
-			grpcClient.setSchema("k8s")
-		}
+		grpcClient.setSchema(regConf.Service)
 	}
 	grpcClient.setup(gloryClientConfig.FiltersKey) // filter keys used by grpc client
 	return grpcClient

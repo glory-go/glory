@@ -18,12 +18,14 @@
 package plugin
 
 import (
+	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/filter"
 	"github.com/glory-go/glory/load_balance"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/protocol"
 	"github.com/glory-go/glory/registry"
+	"google.golang.org/grpc/resolver"
 )
 
 // protocol
@@ -84,4 +86,17 @@ func SetFilterFactory(filterKey string, f filterFactory) {
 
 func GetFilter(filterKey string, filterConfig *config.FilterConfig) (filter.GRPCFilter, error) {
 	return filterFactoryPlugins[filterKey](filterConfig)
+}
+
+// gRPCResolver
+type gRPCResolverFactory func(ch chan common.RegistryChangeEvent, cc resolver.ClientConn) resolver.Resolver
+
+var gRPCResolverPlugins = make(map[string]gRPCResolverFactory)
+
+func SetGRPCResolverFactory(gRPCResolverType string, f gRPCResolverFactory) {
+	gRPCResolverPlugins[gRPCResolverType] = f
+}
+
+func GetGRPCResolver(gRPCResolverType string, ch chan common.RegistryChangeEvent, cc resolver.ClientConn) resolver.Resolver {
+	return gRPCResolverPlugins[gRPCResolverType](ch, cc)
 }
