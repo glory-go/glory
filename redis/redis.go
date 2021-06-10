@@ -10,7 +10,6 @@ import (
 
 func init() {
 	defaultRedisHandler = newRedisHandler()
-	defaultRedisHandler.setup(config.GlobalServerConf.RedisConfig)
 }
 
 type RedisHandler struct {
@@ -34,10 +33,11 @@ func newRedisHandler() *RedisHandler {
 }
 
 func NewRedisClient(redisServiceName string, db int) (*redis.Client, error) {
+	defaultRedisHandler.setup(config.GlobalServerConf.RedisConfig)
 	service, ok := defaultRedisHandler.redisServices[redisServiceName]
 	if !ok {
-		log.Error("redis service name = ", redisServiceName, "not registered in config")
-		return nil, errors.New("mysql service name = " + redisServiceName + "not registered in config")
+		log.Error("redis service name = ", redisServiceName, " not registered in config")
+		return nil, errors.New("mysql service name = " + redisServiceName + " not registered in config")
 	}
 	// 检查是否初始化，未初始化则进行初始化，这里是为了保证使用时才去初始化
 	service.RLock()

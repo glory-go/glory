@@ -120,5 +120,6 @@ func NewServerConfig() *ServerConfig {
 		MQConfig:       map[string]*MQConfig{},
 		OssConfigs:     make(map[string]*OssConfig),
 		ClientConfig:   make(map[string]*ClientConfig),
+		RegistryConfig: make(map[string]*RegistryConfig),
 	}
 }

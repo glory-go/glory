@@ -121,16 +121,14 @@ func init() {
 		return
 	}
 	if err := loadFileConfig(); err != nil {
+		fmt.Printf("load conf from file failed with err =  %s, try to load from default config\n", err)
 		loadDefaultConfig()
-		fmt.Printf("error: load conf failed %s\n", err)
 	}
 	// no config file
 }
 
 func loadDefaultConfig() {
-	defaultSrvConf := &ServerConfig{
-		LogConfigs: make(map[string]*LogConfig),
-	}
+	defaultSrvConf := NewServerConfig()
 	defaultSrvConf.LogConfigs["default-log"] = &LogConfig{
 		LogType:  "console",
 		LogLevel: "debug",
