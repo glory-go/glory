@@ -9,7 +9,7 @@ require (
 	github.com/apache/dubbo-go v1.5.6-rc2.0.20210405080051-eeaca76e44bc
 	github.com/apache/dubbo-go-hessian2 v1.9.1
 	github.com/dubbogo/gost v1.11.3
-	github.com/dubbogo/triple v0.1.1
+	github.com/dubbogo/triple v1.0.1
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis v6.15.9+incompatible
