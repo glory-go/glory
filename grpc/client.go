@@ -31,7 +31,6 @@ func (gc *GrpcClient) setSchema(schema string) {
 	gc.schema = schema
 }
 
-
 func (gc *GrpcClient) setClientName(clientName string) {
 	gc.clientName = clientName
 }
@@ -48,7 +47,7 @@ func (gc *GrpcClient) setup(filtersKey []string) {
 	} else {
 		dialOption = addDialOptionsWithLoadBalancer(dialOption)
 		dialOption = addDialOptionsWithSchemaResolver(dialOption, gc.schema)
-		gc.conn, err = grpc.Dial(gc.schema + ":///"+gc.clientName, dialOption...)
+		gc.conn, err = grpc.Dial(gc.schema+":///"+gc.clientName, dialOption...)
 	}
 	if err != nil {
 		log.Error(err)
