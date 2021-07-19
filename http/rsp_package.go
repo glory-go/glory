@@ -36,7 +36,7 @@ func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result inter
 
 func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
 	if retCode == UnsetHttpCode {
-		retCode = DefaultHttpSuccessCode
+		retCode = http.StatusInternalServerError
 	}
 	w.WriteHeader(int(retCode))
 	rpkgBody := make([]byte, 0)
