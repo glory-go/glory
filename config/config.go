@@ -32,17 +32,14 @@ type config interface {
 	checkAndFix()
 }
 
-func loadFileConfig() error {
-	conf := NewServerConfig()
+func GetConfigPath() string {
+	configPath := ""
 	env := os.Getenv(EnvKeyGloryEnv)
 
 	configFilePath := DefaultConfigPath
 	if os.Getenv(EnvKeyGloryConfigPath) != "" {
 		configFilePath = os.Getenv(EnvKeyGloryConfigPath)
 	}
-
-	var yamlFile []byte
-	var err error
 	prefix := strings.Split(configFilePath, ".yaml")
 	// prefix == ["config/glory", ""]
 	if len(prefix) != 2 {
@@ -50,10 +47,18 @@ func loadFileConfig() error {
 	}
 	// get target env yaml file
 	if env != "" {
-		yamlFile, err = ioutil.ReadFile(prefix[0] + "_" + env + ".yaml")
+		configPath = prefix[0] + "_" + env + ".yaml"
 	} else {
-		yamlFile, err = ioutil.ReadFile(configFilePath)
+		configPath = configFilePath
 	}
+	return configPath
+}
+
+func loadFileConfig() error {
+	conf := NewServerConfig()
+	configPath := GetConfigPath()
+
+	yamlFile, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		fmt.Printf("error: yamlFile get error= %v\n", err)
 		return errors.New("yamlFile.Get err ")
