@@ -63,6 +63,7 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 			W:           w,
 			RspCode:     UnsetHttpCode,
 			IfNeedWrite: true,
+			VarsMap: mux.Vars(r),
 		}
 
 		// 处理 req

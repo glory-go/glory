@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 
 	"github.com/glory-go/glory/log"
@@ -53,8 +52,6 @@ type GRegisterWSController struct {
 // 获取请求参数并进行参数校验
 func (trc *GRegisterController) GetReqData(r *http.Request) error {
 	var err error
-	trc.VarsMap = make(map[string]string)
-	trc.VarsMap = mux.Vars(r)
 
 	// 解析qury。body数据
 	if err = r.ParseForm(); err != nil {
