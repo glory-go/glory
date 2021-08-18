@@ -14,6 +14,8 @@ import (
 type HttpService struct {
 	serviceBase
 	router *mux.Router
+
+	mws []negroni.Handler
 }
 
 func NewHttpService(name string) *HttpService {
@@ -28,9 +30,16 @@ func (hs *HttpService) setup() {
 	hs.router = mux.NewRouter()
 }
 
+func (hs *HttpService) UseMW(filters ...negroni.Handler) {
+	hs.mws = append(hs.mws, filters...)
+}
+
 func (hs *HttpService) Run(ctx context.Context) {
 	// handler := cors.Default().Handler(hs.router)
 	s := negroni.Classic()
+	for _, handler := range hs.mws {
+		s.Use(handler)
+	}
 	s.UseHandler(hs.router)
 	s.Run(":" + strconv.Itoa(hs.conf.addr.Port))
 }
