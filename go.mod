@@ -15,23 +15,23 @@ require (
 	github.com/gogap/errors v0.0.0-20200228125012-531a6449b28c
 	github.com/gogap/stack v0.0.0-20150131034635-fef68dddd4f8 // indirect
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
 	github.com/gorilla/websocket v1.4.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/olivere/elastic/v7 v7.0.22
+	github.com/opentracing-contrib/go-stdlib v1.0.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.9.0
-	github.com/prometheus/tsdb v0.7.1 // indirect
 	github.com/qiniu/api.v7/v7 v7.8.0
 	github.com/rs/xid v1.2.1
-	github.com/spf13/viper v1.8.1 // indirect
+	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0

@@ -10,12 +10,15 @@ import (
 
 	"github.com/glory-go/glory/config"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
 type GrpcService struct {
 	serviceBase
 	grpcServer *grpc.Server
+
+	unaryMWs []grpc.UnaryServerInterceptor
 }
 
 func NewGrpcService(name string) *GrpcService {
@@ -27,10 +30,20 @@ func NewGrpcService(name string) *GrpcService {
 }
 
 func (gs *GrpcService) setup() {
-	gs.grpcServer = grpc.NewServer(getOptionFromFilter(gs.conf.filtersKey)...)
+	gs.unaryMWs = make([]grpc.UnaryServerInterceptor, 0)
+}
+
+func (gs *GrpcService) RegisterUnaryInterceptor(mw ...grpc.UnaryServerInterceptor) {
+	gs.unaryMWs = append(gs.unaryMWs, mw...)
 }
 
 func (gs *GrpcService) Run(ctx context.Context) {
+	gs.grpcServer = grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(gs.unaryMWs...),
+		),
+	)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", gs.conf.addr.Port))
 	if err != nil {
 		log.Fatalf("failed to listen grpc: %v", err)
