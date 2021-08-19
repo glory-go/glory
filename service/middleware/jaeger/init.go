@@ -3,6 +3,7 @@ package jaeger
 import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/tools"
 	"github.com/opentracing/opentracing-go"
 	jaeger "github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/transport"
@@ -13,7 +14,8 @@ var (
 )
 
 type aliyunJaegerConfig struct {
-	Endpoint string
+	ConfigSource string `yaml:"config_source"`
+	Endpoint     string
 }
 
 func init() {
@@ -21,6 +23,10 @@ func init() {
 	jaegerConfig := &aliyunJaegerConfig{}
 	if err := viper.Unmarshal(jaegerConfig); err != nil {
 		log.Warnf("jager fail to parse config with err %v", err)
+		return
+	}
+	if err := tools.ReadFromEnvIfNeed(jaegerConfig); err != nil {
+		log.Warnf("jager fail to read config in env with err %v", err)
 		return
 	}
 	sender := transport.NewHTTPTransport(
