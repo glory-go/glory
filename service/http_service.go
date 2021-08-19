@@ -7,6 +7,7 @@ import (
 
 	"github.com/glory-go/glory/config"
 	ghttp "github.com/glory-go/glory/http"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
@@ -28,6 +29,7 @@ func NewHttpService(name string) *HttpService {
 
 func (hs *HttpService) setup() {
 	hs.router = mux.NewRouter()
+	hs.UseMW(&jaeger.AliyunJaegerMW{})
 }
 
 func (hs *HttpService) UseMW(filters ...negroni.Handler) {

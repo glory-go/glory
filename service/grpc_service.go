@@ -7,6 +7,7 @@ import (
 	"net"
 
 	"github.com/glory-go/glory/filter/intercepter_impl"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 
 	"github.com/glory-go/glory/config"
 
@@ -31,6 +32,7 @@ func NewGrpcService(name string) *GrpcService {
 
 func (gs *GrpcService) setup() {
 	gs.unaryMWs = make([]grpc.UnaryServerInterceptor, 0)
+	gs.RegisterUnaryInterceptor(jaeger.UnaryServerMW())
 }
 
 func (gs *GrpcService) RegisterUnaryInterceptor(mw ...grpc.UnaryServerInterceptor) {

@@ -12,6 +12,10 @@ var (
 	tracer opentracing.Tracer
 )
 
+type aliyunJaegerConfig struct {
+	Endpoint string
+}
+
 func init() {
 	viper := config.GetViperConfig()
 	jaegerConfig := &aliyunJaegerConfig{}
@@ -25,5 +29,16 @@ func init() {
 	tracer, _ = jaeger.NewTracer(config.GlobalServerConf.GetAppKey(),
 		jaeger.NewConstSampler(true),
 		jaeger.NewRemoteReporter(sender),
+		jaeger.TracerOptions.Logger(&jaegerLogger{}),
 	)
+}
+
+type jaegerLogger struct{}
+
+func (l *jaegerLogger) Error(msg string) {
+	log.Error(msg)
+}
+
+func (l *jaegerLogger) Infof(msg string, args ...interface{}) {
+	log.Infof(msg, args...)
 }

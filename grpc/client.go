@@ -7,6 +7,7 @@ import (
 	"github.com/glory-go/glory/filter/intercepter_impl"
 	_ "github.com/glory-go/glory/grpc/resolver"
 	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/balancer/roundrobin"
@@ -40,6 +41,7 @@ func (gc *GrpcClient) setup(unaryMWs ...grpc.UnaryClientInterceptor) {
 	var err error
 	dialOption := []grpc.DialOption{grpc.WithInsecure()}
 	// add client middlewares
+	unaryMWs = append(unaryMWs, jaeger.UnaryClientMW())
 	dialOption = append(dialOption,
 		grpc.WithUnaryInterceptor(
 			grpc_middleware.ChainUnaryClient(unaryMWs...),

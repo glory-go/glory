@@ -9,10 +9,6 @@ import (
 	jaeger "github.com/uber/jaeger-client-go"
 )
 
-type aliyunJaegerConfig struct {
-	Endpoint string
-}
-
 type AliyunJaegerMW struct{}
 
 func (m *AliyunJaegerMW) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
