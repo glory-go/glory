@@ -40,8 +40,9 @@ require (
 	github.com/urfave/negroni v1.0.0
 	github.com/valyala/fasthttp v1.24.0 // indirect
 	go.mongodb.org/mongo-driver v1.4.4
-	go.uber.org/atomic v1.7.0
-	go.uber.org/zap v1.17.0
+	go.uber.org/atomic v1.9.0
+	go.uber.org/multierr v1.7.0 // indirect
+	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20210415231046-e915ea6b2b7d // indirect
 	google.golang.org/grpc v1.38.0
 	gopkg.in/yaml.v2 v2.4.0

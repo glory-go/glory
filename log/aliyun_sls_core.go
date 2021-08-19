@@ -49,12 +49,6 @@ func (c *aliyunSLSCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapc
 }
 
 func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	// goonline doesn't need fields in message and push fields to specific log content instead
-	buf, err := c.enc.EncodeEntry(ent, []zapcore.Field{})
-	if err != nil {
-		return err
-	}
-
 	content := make([]*sls.LogContent, 0)
 	content = append(content, &sls.LogContent{
 		Key:   proto.String("level"),
@@ -62,7 +56,7 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 	})
 	content = append(content, &sls.LogContent{
 		Key:   proto.String("message"),
-		Value: proto.String(buf.String()),
+		Value: proto.String(ent.Message),
 	})
 
 	content = append(content, &sls.LogContent{
@@ -73,21 +67,11 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 		Key:   proto.String("app"),
 		Value: proto.String(c.serverName),
 	})
-	traceIDValid := false
-	if len(fields) != 0 {
-		values, ok := fields[0].Interface.([]interface{})
-		if ok && len(values) == 2 && values[0].(string) == "uber-trace-id" {
-			content = append(content, &sls.LogContent{
-				Key:   proto.String("traceid"),
-				Value: proto.String(values[1].(string)),
-			})
-			traceIDValid = true
-		}
-	}
-	if !traceIDValid {
+	// add fields
+	for _, field := range fields {
 		content = append(content, &sls.LogContent{
-			Key:   proto.String("traceid"),
-			Value: proto.String("unknown"),
+			Key:   proto.String(field.Key),
+			Value: proto.String(field.String),
 		})
 	}
 

@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
-
-	"google.golang.org/grpc/metadata"
 
 	"github.com/glory-go/glory/config"
 	"github.com/natefinch/lumberjack"
 	"github.com/olivere/elastic/v7"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -31,6 +30,10 @@ type Logger struct {
 	config   map[string]*LoggerConfig
 	logger   []*zap.SugaredLogger
 	enconfig zapcore.EncoderConfig
+}
+
+func GetTraceIDKey() string {
+	return "uber-trace-id"
 }
 
 func NewLogger() *Logger {
@@ -181,7 +184,7 @@ func getAliyunSLSLogger(level zapcore.Level, enconfig zapcore.EncoderConfig, con
 		serverName,
 		orgName,
 	)
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
 	return logger.Sugar()
 }
 
@@ -190,22 +193,15 @@ func getremoteSugaredLogger(level zapcore.Level) *zap.SugaredLogger {
 	return nil
 }
 
-func getTraceIDFromUberCtx(ctx context.Context) ([]interface{}, bool) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		md = metadata.New(nil)
-		return []interface{}{}, false
+func getTraceIDFromUberCtx(ctx context.Context) (string, bool) {
+	span := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		return "", false
 	}
-	traceIDFields := md.Get("uber-trace-id")
-	if len(traceIDFields) == 0 {
-		return []interface{}{}, false
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		return sc.TraceID().String(), true
 	}
-	idList := strings.Split(traceIDFields[0], ":")
-	if len(idList) == 0 {
-		return []interface{}{}, false
-	}
-	//todo use to extend ctx field as user wanted
-	return []interface{}{"uber-trace-id", idList[0]}, true
+	return "", false
 }
 
 func (l *Logger) debugf(template string, arg ...interface{}) {
