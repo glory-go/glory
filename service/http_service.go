@@ -60,7 +60,7 @@ func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler fun
 // RegisterRouter 对用户暴露的接口
 func (hs *HttpService) RegisterRouter(path string, handler func(*ghttp.GRegisterController) error, req interface{},
 	rsp interface{}, method string, filters ...ghttp.Filter) {
-	filters = append(filters, hs.gloryMWs...)
+	filters = append(hs.gloryMWs, filters...)
 	ghttp.RegisterRouter(path, hs.router, handler, req, rsp, method, filters)
 }
 
