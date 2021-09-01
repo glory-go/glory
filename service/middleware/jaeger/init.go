@@ -1,7 +1,10 @@
 package jaeger
 
 import (
+	"io"
+
 	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/grmanager"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/tools"
 	"github.com/opentracing/opentracing-go"
@@ -36,11 +39,13 @@ func init() {
 	sender := transport.NewHTTPTransport(
 		jaegerConfig.Endpoint,
 	)
-	tracer, _ = jaeger.NewTracer(config.GlobalServerConf.GetAppKey(),
+	var closer io.Closer
+	tracer, closer = jaeger.NewTracer(config.GlobalServerConf.GetAppKey(),
 		jaeger.NewConstSampler(true),
 		jaeger.NewRemoteReporter(sender),
 		jaeger.TracerOptions.Logger(&jaegerLogger{}),
 	)
+	grmanager.RegisterCloser(closer)
 }
 
 type jaegerLogger struct{}

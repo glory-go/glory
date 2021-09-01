@@ -19,6 +19,7 @@ package grmanager
 
 import (
 	"context"
+	"io"
 	"os"
 	"os/signal"
 	"syscall"
@@ -40,7 +41,10 @@ var shutdownSignals = []os.Signal{
 	syscall.SIGKILL,
 }
 
-var cancelPool []context.CancelFunc
+var (
+	cancelPool []context.CancelFunc
+	closers    []io.Closer
+)
 
 func init() {
 	signals := make(chan os.Signal, 1)
@@ -53,11 +57,18 @@ func init() {
 				for _, v := range cancelPool {
 					v()
 				}
+				for _, closer := range closers {
+					go closer.Close()
+				}
 				time.Sleep(time.Second)
 				os.Exit(0)
 			}
 		}
 	}()
+}
+
+func RegisterCloser(c io.Closer) {
+	closers = append(closers, c)
 }
 
 func NewCtx() context.Context {
