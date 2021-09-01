@@ -35,6 +35,6 @@ func (m *AliyunJaegerMW) GloryMW(c *ghttp.GRegisterController, f ghttp.HandleFun
 	nethttp.MiddlewareFunc(tracer, func(rw http.ResponseWriter, r *http.Request) {
 		f(c)
 	})(c.W, c.R)
-	addTraceID2ResHeader(c.Ctx, c.W)
+	addTraceID2ResHeader(c.R.Context(), c.W)
 	return nil
 }
