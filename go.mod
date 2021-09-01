@@ -47,7 +47,8 @@ require (
 	google.golang.org/grpc v1.38.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.0.3
-	gorm.io/gorm v1.20.8
+	gorm.io/gorm v1.20.12
+	gorm.io/plugin/opentracing v0.0.0-20210706093620-707e98269c0e
 	k8s.io/api v0.19.0
 	k8s.io/apimachinery v0.19.0
 	k8s.io/client-go v0.19.0
