@@ -9,6 +9,10 @@ import (
 	"github.com/uber/jaeger-client-go/transport"
 )
 
+const (
+	AliyunJaegerConfigKey = "aliyun_jaeger"
+)
+
 var (
 	tracer opentracing.Tracer
 )
@@ -21,7 +25,7 @@ type aliyunJaegerConfig struct {
 func init() {
 	viper := config.GetViperConfig()
 	jaegerConfig := &aliyunJaegerConfig{}
-	if err := viper.Unmarshal(jaegerConfig); err != nil {
+	if err := viper.UnmarshalKey(AliyunJaegerConfigKey, jaegerConfig); err != nil {
 		log.Warnf("jager fail to parse config with err %v", err)
 		return
 	}
