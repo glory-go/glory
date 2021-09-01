@@ -18,8 +18,8 @@ var (
 )
 
 type aliyunJaegerConfig struct {
-	ConfigSource string `yaml:"config_source"`
-	Endpoint     string
+	ConfigSource string `mapstructure:"config_source"`
+	Endpoint     string `mapstructure:"endpoint"`
 }
 
 func init() {
