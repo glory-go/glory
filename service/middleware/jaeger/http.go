@@ -1,8 +1,10 @@
 package jaeger
 
 import (
+	"context"
 	"net/http"
 
+	ghttp "github.com/glory-go/glory/http"
 	"github.com/glory-go/glory/log"
 	"github.com/opentracing-contrib/go-stdlib/nethttp"
 	"github.com/opentracing/opentracing-go"
@@ -11,10 +13,8 @@ import (
 
 type AliyunJaegerMW struct{}
 
-func (m *AliyunJaegerMW) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	nethttp.MiddlewareFunc(tracer, next)(rw, r)
-	// 将trace-id写到header
-	span := opentracing.SpanFromContext(r.Context())
+func addTraceID2ResHeader(ctx context.Context, rw http.ResponseWriter) {
+	span := opentracing.SpanFromContext(ctx)
 	if span == nil {
 		return
 	}
@@ -23,4 +23,18 @@ func (m *AliyunJaegerMW) ServeHTTP(rw http.ResponseWriter, r *http.Request, next
 		return
 	}
 	rw.Header().Set(log.GetTraceIDKey(), sc.TraceID().String())
+}
+
+func (m *AliyunJaegerMW) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	nethttp.MiddlewareFunc(tracer, next)(rw, r)
+	// 将trace-id写到header
+	addTraceID2ResHeader(r.Context(), rw)
+}
+
+func (m *AliyunJaegerMW) GloryMW(c *ghttp.GRegisterController, f ghttp.HandleFunc) (err error) {
+	nethttp.MiddlewareFunc(tracer, func(rw http.ResponseWriter, r *http.Request) {
+		f(c)
+	})(c.W, c.R)
+	addTraceID2ResHeader(c.Ctx, c.W)
+	return nil
 }

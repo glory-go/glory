@@ -16,7 +16,8 @@ type HttpService struct {
 	serviceBase
 	router *mux.Router
 
-	mws []negroni.Handler
+	mws      []negroni.Handler
+	gloryMWs []ghttp.Filter
 }
 
 func NewHttpService(name string) *HttpService {
@@ -29,11 +30,17 @@ func NewHttpService(name string) *HttpService {
 
 func (hs *HttpService) setup() {
 	hs.router = mux.NewRouter()
-	hs.UseMW(&jaeger.AliyunJaegerMW{})
+
+	aliyunJaegerInstance := &jaeger.AliyunJaegerMW{}
+	hs.UseGloryMW(aliyunJaegerInstance.GloryMW)
 }
 
 func (hs *HttpService) UseMW(filters ...negroni.Handler) {
 	hs.mws = append(hs.mws, filters...)
+}
+
+func (hs *HttpService) UseGloryMW(filters ...ghttp.Filter) {
+	hs.gloryMWs = append(hs.gloryMWs, filters...)
 }
 
 func (hs *HttpService) Run(ctx context.Context) {
@@ -53,6 +60,7 @@ func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler fun
 // RegisterRouter 对用户暴露的接口
 func (hs *HttpService) RegisterRouter(path string, handler func(*ghttp.GRegisterController) error, req interface{},
 	rsp interface{}, method string, filters ...ghttp.Filter) {
+	filters = append(filters, hs.gloryMWs...)
 	ghttp.RegisterRouter(path, hs.router, handler, req, rsp, method, filters)
 }
 
