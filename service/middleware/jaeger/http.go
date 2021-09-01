@@ -19,7 +19,7 @@ func addTraceID2ResHeader(ctx context.Context, rw http.ResponseWriter) {
 		return
 	}
 	sc, ok := span.Context().(jaeger.SpanContext)
-	if ok {
+	if !ok {
 		return
 	}
 	rw.Header().Set(log.GetTraceIDKey(), sc.TraceID().String())
