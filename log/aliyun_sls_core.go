@@ -38,7 +38,7 @@ func addFields(enc zapcore.ObjectEncoder, fields []zapcore.Field) {
 func (c *aliyunSLSCore) With(fields []zapcore.Field) zapcore.Core {
 	clone := c.clone()
 	addFields(clone.enc, fields)
-	return c
+	return clone
 }
 
 func (c *aliyunSLSCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
