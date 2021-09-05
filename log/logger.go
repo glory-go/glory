@@ -178,7 +178,7 @@ func getFileSugaredLogger(level zapcore.Level, filePath string, enconfig zapcore
 
 func getAliyunSLSLogger(level zapcore.Level, enconfig zapcore.EncoderConfig, config *config.LogConfig, serverName, orgName string) *zap.SugaredLogger {
 	core := newAliyunSLSLoggerCore(
-		zapcore.NewConsoleEncoder(enconfig),
+		NewGloryEncoder(enconfig),
 		level,
 		config,
 		serverName,
