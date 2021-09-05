@@ -14,8 +14,9 @@ import (
 
 type aliyunSLSCore struct {
 	zapcore.LevelEnabler
-	enc zapcore.Encoder
-	out zapcore.WriteSyncer
+	enc    zapcore.Encoder
+	out    zapcore.WriteSyncer
+	fields []zapcore.Field
 
 	client       sls.ClientInterface
 	projectName  string
@@ -38,6 +39,7 @@ func addFields(enc zapcore.ObjectEncoder, fields []zapcore.Field) {
 func (c *aliyunSLSCore) With(fields []zapcore.Field) zapcore.Core {
 	clone := c.clone()
 	addFields(clone.enc, fields)
+	clone.fields = append(clone.fields, fields...)
 	return c
 }
 
@@ -68,6 +70,7 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 		Value: proto.String(c.serverName),
 	})
 	// add fields
+	fields = append(fields, c.fields...)
 	for _, field := range fields {
 		content = append(content, &sls.LogContent{
 			Key:   proto.String(field.Key),

@@ -40,7 +40,9 @@ func (ms *MysqlService) openDB(conf config.MysqlConfig) error {
 		log.Error("opendb error with err = ", err)
 		return err
 	}
-	ms.DB, err = gorm.Open(mysql.Open(getMysqlLinkStr(ms.conf)), &gorm.Config{})
+	ms.DB, err = gorm.Open(mysql.Open(getMysqlLinkStr(ms.conf)), &gorm.Config{
+		Logger: NewGormLogger(),
+	})
 	if err != nil {
 		log.Error("open db error ", err, "with db config = ", ms.conf)
 		return err
