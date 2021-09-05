@@ -74,6 +74,12 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 			Value: proto.String(gloryE.traceID),
 		})
 	}
+	if ent.Level >= zapcore.ErrorLevel {
+		content = append(content, &sls.LogContent{
+			Key:   proto.String("stack"),
+			Value: proto.String(ent.Stack),
+		})
+	}
 	// add fields
 	for _, field := range fields {
 		content = append(content, &sls.LogContent{
