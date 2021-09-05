@@ -134,11 +134,11 @@ func (c *aliyunSLSCore) Sync() error {
 }
 
 func (c *aliyunSLSCore) clone() *aliyunSLSCore {
-	return &aliyunSLSCore{
-		LevelEnabler: c.LevelEnabler,
-		enc:          c.enc.Clone(),
-		out:          c.out,
-	}
+	clone := *c
+	clone.enc = c.enc.Clone()
+	clone.out = c.out
+	clone.lock = sync.RWMutex{}
+	return &clone
 }
 
 func (c *aliyunSLSCore) runUpload() {
