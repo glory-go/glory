@@ -217,7 +217,7 @@ func (l *Logger) ctxDebugf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Debugf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Debugf(template, arg...)
 	}
 }
 
@@ -234,7 +234,7 @@ func (l *Logger) ctxInfof(ctx context.Context, template string, arg ...interface
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Infof(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Infof(template, arg...)
 	}
 }
 
@@ -251,7 +251,7 @@ func (l *Logger) ctxWarnf(ctx context.Context, template string, arg ...interface
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Warnf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Warnf(template, arg...)
 	}
 }
 
@@ -272,7 +272,7 @@ func (l *Logger) ctxErrorf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Errorf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Errorf(template, arg...)
 	}
 }
 
@@ -288,7 +288,7 @@ func (l *Logger) ctxPanicf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Panicf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Panicf(template, arg...)
 	}
 }
 
@@ -305,7 +305,7 @@ func (l *Logger) ctxDebug(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Debug(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Debug(arg...)
 	}
 }
 
@@ -322,7 +322,7 @@ func (l *Logger) ctxInfo(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Info(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Info(arg...)
 	}
 }
 
@@ -339,7 +339,7 @@ func (l *Logger) ctxWarn(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Warn(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Warn(arg...)
 	}
 }
 
@@ -358,7 +358,7 @@ func (l *Logger) ctxError(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Error(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Error(arg...)
 	}
 }
 
@@ -376,6 +376,6 @@ func (l *Logger) ctxPanic(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(GetTraceIDKey(), traceID).Panic(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Panic(arg...)
 	}
 }
