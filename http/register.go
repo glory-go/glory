@@ -58,12 +58,11 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 		chain.AddFilter(filters) // 注册过滤器
 
 		tRegisterController := GRegisterController{
-			Ctx:         r.Context(),
 			R:           r,
 			W:           w,
 			RspCode:     UnsetHttpCode,
 			IfNeedWrite: true,
-			VarsMap: mux.Vars(r),
+			VarsMap:     mux.Vars(r),
 		}
 
 		// 处理 req
@@ -95,8 +94,6 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 
 		// 最终回包
 		retPkg.SetSuccessPkg(w, tRegisterController.Rsp, tRegisterController.RspCode)
-
-		return
 	}
 }
 

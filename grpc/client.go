@@ -7,6 +7,8 @@ import (
 	"github.com/glory-go/glory/filter/intercepter_impl"
 	_ "github.com/glory-go/glory/grpc/resolver"
 	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/service/middleware/jaeger"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/balancer/roundrobin"
 )
@@ -35,11 +37,16 @@ func (gc *GrpcClient) setClientName(clientName string) {
 	gc.clientName = clientName
 }
 
-func (gc *GrpcClient) setup(filtersKey []string) {
+func (gc *GrpcClient) setup(unaryMWs ...grpc.UnaryClientInterceptor) {
 	var err error
 	dialOption := []grpc.DialOption{grpc.WithInsecure()}
-	// add grpc filter
-	dialOption = addDialOptionsWithFilters(dialOption, filtersKey)
+	// add client middlewares
+	unaryMWs = append(unaryMWs, jaeger.UnaryClientMW())
+	dialOption = append(dialOption,
+		grpc.WithUnaryInterceptor(
+			grpc_middleware.ChainUnaryClient(unaryMWs...),
+		),
+	)
 
 	if gc.targetAddress != nil {
 		// no need service discovery
@@ -78,7 +85,7 @@ func addDialOptionsWithSchemaResolver(opts []grpc.DialOption, schema string) []g
 	return append(opts, grpc.WithResolvers(NewResolverBuilder(schema))) //,
 }
 
-func NewGrpcClient(grpcClientName string) *GrpcClient {
+func NewGrpcClient(grpcClientName string, unaryMWs ...grpc.UnaryClientInterceptor) *GrpcClient {
 	//var targetAddress []common.Address
 	// get glory client config
 	gloryClientConfig, ok := config.GlobalServerConf.ClientConfig[grpcClientName]
@@ -95,11 +102,11 @@ func NewGrpcClient(grpcClientName string) *GrpcClient {
 	if regConf, ok := config.GlobalServerConf.RegistryConfig[gloryClientConfig.RegistryKey]; ok {
 		grpcClient.setSchema(regConf.Service)
 	}
-	grpcClient.setup(gloryClientConfig.FiltersKey) // filter keys used by grpc client
+	grpcClient.setup(unaryMWs...) // filter keys used by grpc client
 	return grpcClient
 }
 
-func NewGrpcClientWithDynamicAddr(grpcClientName string, addr string) *GrpcClient {
+func NewGrpcClientWithDynamicAddr(grpcClientName string, addr string, unaryMWs ...grpc.UnaryClientInterceptor) *GrpcClient {
 	gloryClientConfig, ok := config.GlobalServerConf.ClientConfig[grpcClientName]
 	if !ok {
 		panic("glory serviceName " + grpcClientName + " in your source code not found in config file!")
@@ -114,6 +121,6 @@ func NewGrpcClientWithDynamicAddr(grpcClientName string, addr string) *GrpcClien
 			grpcClient.setSchema("k8s")
 		}
 	}
-	grpcClient.setup(gloryClientConfig.FiltersKey) // filter keys used by grpc client
+	grpcClient.setup(unaryMWs...) // filter keys used by grpc client
 	return grpcClient
 }

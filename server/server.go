@@ -88,6 +88,7 @@ func (s *DefaultGloryServer) Run() {
 				}
 				wg.Done()
 			}()
+			ctx, _ = context.WithCancel(ctx)
 			s.Run(ctx)
 		}(v, &s.wg, s.ctx)
 	}

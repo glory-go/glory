@@ -118,7 +118,6 @@ func loadConfigCenterConfig() bool {
 		fmt.Println("error: load config from remote config center successful")
 		return true
 	}
-
 }
 
 func init() {

@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -33,8 +32,6 @@ type GRegisterController struct {
 	R *http.Request
 	// W 暴露 http.ResponseWriter
 	W http.ResponseWriter
-	// Ctx 传递出来的 context 供 handle 使用
-	Ctx context.Context
 	// VarsMap url 变量
 	VarsMap map[string]string
 	// RspCode 返回http状态码,不设则使用默认成功、失败状态码

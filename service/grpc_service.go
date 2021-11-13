@@ -7,15 +7,19 @@ import (
 	"net"
 
 	"github.com/glory-go/glory/filter/intercepter_impl"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 
 	"github.com/glory-go/glory/config"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"google.golang.org/grpc"
 )
 
 type GrpcService struct {
 	serviceBase
 	grpcServer *grpc.Server
+
+	unaryMWs []grpc.UnaryServerInterceptor
 }
 
 func NewGrpcService(name string) *GrpcService {
@@ -27,7 +31,12 @@ func NewGrpcService(name string) *GrpcService {
 }
 
 func (gs *GrpcService) setup() {
-	gs.grpcServer = grpc.NewServer(getOptionFromFilter(gs.conf.filtersKey)...)
+	gs.unaryMWs = make([]grpc.UnaryServerInterceptor, 0)
+	gs.RegisterUnaryInterceptor(jaeger.UnaryServerMW())
+}
+
+func (gs *GrpcService) RegisterUnaryInterceptor(mw ...grpc.UnaryServerInterceptor) {
+	gs.unaryMWs = append(gs.unaryMWs, mw...)
 }
 
 func (gs *GrpcService) Run(ctx context.Context) {
@@ -43,6 +52,11 @@ func (gs *GrpcService) Run(ctx context.Context) {
 
 // GetGrpcServer 对用户暴露的接口
 func (gs *GrpcService) GetGrpcServer() *grpc.Server {
+	gs.grpcServer = grpc.NewServer(
+		grpc.UnaryInterceptor(
+			grpc_middleware.ChainUnaryServer(gs.unaryMWs...),
+		),
+	)
 	return gs.grpcServer
 }
 

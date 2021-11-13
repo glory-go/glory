@@ -38,7 +38,7 @@ func addFields(enc zapcore.ObjectEncoder, fields []zapcore.Field) {
 func (c *aliyunSLSCore) With(fields []zapcore.Field) zapcore.Core {
 	clone := c.clone()
 	addFields(clone.enc, fields)
-	return c
+	return clone
 }
 
 func (c *aliyunSLSCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
@@ -49,12 +49,6 @@ func (c *aliyunSLSCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapc
 }
 
 func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	// goonline doesn't need fields in message and push fields to specific log content instead
-	buf, err := c.enc.EncodeEntry(ent, []zapcore.Field{})
-	if err != nil {
-		return err
-	}
-
 	content := make([]*sls.LogContent, 0)
 	content = append(content, &sls.LogContent{
 		Key:   proto.String("level"),
@@ -62,7 +56,7 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 	})
 	content = append(content, &sls.LogContent{
 		Key:   proto.String("message"),
-		Value: proto.String(buf.String()),
+		Value: proto.String(ent.Message),
 	})
 
 	content = append(content, &sls.LogContent{
@@ -73,21 +67,24 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 		Key:   proto.String("app"),
 		Value: proto.String(c.serverName),
 	})
-	traceIDValid := false
-	if len(fields) != 0 {
-		values, ok := fields[0].Interface.([]interface{})
-		if ok && len(values) == 2 && values[0].(string) == "uber-trace-id" {
-			content = append(content, &sls.LogContent{
-				Key:   proto.String("traceid"),
-				Value: proto.String(values[1].(string)),
-			})
-			traceIDValid = true
-		}
-	}
-	if !traceIDValid {
+	gloryE, ok := c.enc.(*GloryEncoder)
+	if ok {
 		content = append(content, &sls.LogContent{
-			Key:   proto.String("traceid"),
-			Value: proto.String("unknown"),
+			Key:   proto.String("logid"),
+			Value: proto.String(gloryE.traceID),
+		})
+	}
+	if ent.Level >= zapcore.ErrorLevel {
+		content = append(content, &sls.LogContent{
+			Key:   proto.String("stack"),
+			Value: proto.String(ent.Stack),
+		})
+	}
+	// add fields
+	for _, field := range fields {
+		content = append(content, &sls.LogContent{
+			Key:   proto.String(field.Key),
+			Value: proto.String(field.String),
 		})
 	}
 
@@ -137,11 +134,11 @@ func (c *aliyunSLSCore) Sync() error {
 }
 
 func (c *aliyunSLSCore) clone() *aliyunSLSCore {
-	return &aliyunSLSCore{
-		LevelEnabler: c.LevelEnabler,
-		enc:          c.enc.Clone(),
-		out:          c.out,
-	}
+	clone := *c
+	clone.enc = c.enc.Clone()
+	clone.out = c.out
+	clone.lock = sync.RWMutex{}
+	return &clone
 }
 
 func (c *aliyunSLSCore) runUpload() {

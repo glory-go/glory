@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
-
-	"google.golang.org/grpc/metadata"
 
 	"github.com/glory-go/glory/config"
 	"github.com/natefinch/lumberjack"
 	"github.com/olivere/elastic/v7"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -31,6 +30,10 @@ type Logger struct {
 	config   map[string]*LoggerConfig
 	logger   []*zap.SugaredLogger
 	enconfig zapcore.EncoderConfig
+}
+
+func GetTraceIDKey() string {
+	return "uber-trace-id"
 }
 
 func NewLogger() *Logger {
@@ -175,13 +178,13 @@ func getFileSugaredLogger(level zapcore.Level, filePath string, enconfig zapcore
 
 func getAliyunSLSLogger(level zapcore.Level, enconfig zapcore.EncoderConfig, config *config.LogConfig, serverName, orgName string) *zap.SugaredLogger {
 	core := newAliyunSLSLoggerCore(
-		zapcore.NewConsoleEncoder(enconfig),
+		NewGloryEncoder(enconfig),
 		level,
 		config,
 		serverName,
 		orgName,
 	)
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(3))
 	return logger.Sugar()
 }
 
@@ -190,22 +193,15 @@ func getremoteSugaredLogger(level zapcore.Level) *zap.SugaredLogger {
 	return nil
 }
 
-func getTraceIDFromUberCtx(ctx context.Context) ([]interface{}, bool) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		md = metadata.New(nil)
-		return []interface{}{}, false
+func getTraceIDFromUberCtx(ctx context.Context) (string, bool) {
+	span := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		return "", false
 	}
-	traceIDFields := md.Get("uber-trace-id")
-	if len(traceIDFields) == 0 {
-		return []interface{}{}, false
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		return sc.TraceID().String(), true
 	}
-	idList := strings.Split(traceIDFields[0], ":")
-	if len(idList) == 0 {
-		return []interface{}{}, false
-	}
-	//todo use to extend ctx field as user wanted
-	return []interface{}{"uber-trace-id", idList[0]}, true
+	return "", false
 }
 
 func (l *Logger) debugf(template string, arg ...interface{}) {
@@ -221,7 +217,7 @@ func (l *Logger) ctxDebugf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Debugf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Debugf(template, arg...)
 	}
 }
 
@@ -238,7 +234,7 @@ func (l *Logger) ctxInfof(ctx context.Context, template string, arg ...interface
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Infof(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Infof(template, arg...)
 	}
 }
 
@@ -255,7 +251,7 @@ func (l *Logger) ctxWarnf(ctx context.Context, template string, arg ...interface
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Warnf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Warnf(template, arg...)
 	}
 }
 
@@ -276,7 +272,7 @@ func (l *Logger) ctxErrorf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Errorf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Errorf(template, arg...)
 	}
 }
 
@@ -292,7 +288,7 @@ func (l *Logger) ctxPanicf(ctx context.Context, template string, arg ...interfac
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Panicf(template, arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Panicf(template, arg...)
 	}
 }
 
@@ -309,7 +305,7 @@ func (l *Logger) ctxDebug(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Debug(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Debug(arg...)
 	}
 }
 
@@ -326,7 +322,7 @@ func (l *Logger) ctxInfo(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Info(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Info(arg...)
 	}
 }
 
@@ -343,7 +339,7 @@ func (l *Logger) ctxWarn(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Warn(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Warn(arg...)
 	}
 }
 
@@ -362,7 +358,7 @@ func (l *Logger) ctxError(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Error(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Error(arg...)
 	}
 }
 
@@ -380,6 +376,6 @@ func (l *Logger) ctxPanic(ctx context.Context, arg ...interface{}) {
 		return
 	}
 	for _, v := range l.logger {
-		v.With(traceID).Panic(arg...)
+		With(ctx, v.With(GetTraceIDKey(), traceID)).Panic(arg...)
 	}
 }

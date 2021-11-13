@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 	"gorm.io/gorm"
 
 	"github.com/glory-go/glory/config"
@@ -39,10 +40,16 @@ func (ms *MysqlService) openDB(conf config.MysqlConfig) error {
 		log.Error("opendb error with err = ", err)
 		return err
 	}
-	ms.DB, err = gorm.Open(mysql.Open(getMysqlLinkStr(ms.conf)), &gorm.Config{})
+	ms.DB, err = gorm.Open(mysql.Open(getMysqlLinkStr(ms.conf)), &gorm.Config{
+		Logger: NewGormLogger(),
+	})
 	if err != nil {
 		log.Error("open db error ", err, "with db config = ", ms.conf)
 		return err
+	}
+	if err := jaeger.GormUseTrace(ms.DB); err != nil {
+		log.Error("register tracer meets error", err)
+		return nil
 	}
 	return nil
 }
