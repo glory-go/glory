@@ -30,8 +30,12 @@ func NewHttpService(name string, enableMetrics bool) *HttpService {
 
 	if enableMetrics {
 		httpService.RegisterRouterWithRawHttpHandler("/metrics", promhttp.Handler().ServeHTTP, http.MethodGet)
-		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/{profile}", pprof.Index)
 		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/", pprof.Index)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/cmdline", pprof.Cmdline)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/profile", pprof.Profile)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/symbol", pprof.Symbol)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/trace", pprof.Trace)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/{profile}", pprof.Index)
 	}
 	return httpService
 }
