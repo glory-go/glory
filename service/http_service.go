@@ -30,7 +30,7 @@ func NewHttpService(name string, enableMetrics bool) *HttpService {
 
 	if enableMetrics {
 		httpService.RegisterRouterWithRawHttpHandler("/metrics", promhttp.Handler().ServeHTTP, http.MethodGet)
-		httpService.RegisterPrefixRouterWithRawHttpHandler("/debug/pprof/", pprof.Index)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/{profile}", pprof.Index)
 	}
 	return httpService
 }
@@ -62,14 +62,6 @@ func (hs *HttpService) Run(ctx context.Context) {
 
 func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler func(w http.ResponseWriter, r *http.Request), method ...string) {
 	r := hs.router.HandleFunc(path, handler)
-	// 未传method则match all
-	if len(method) != 0 {
-		r.Methods(method...)
-	}
-}
-
-func (hs *HttpService) RegisterPrefixRouterWithRawHttpHandler(prefix string, handler func(w http.ResponseWriter, r *http.Request), method ...string) {
-	r := hs.router.PathPrefix(prefix).HandlerFunc(handler)
 	// 未传method则match all
 	if len(method) != 0 {
 		r.Methods(method...)
