@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
+	github.com/alexflint/go-arg v1.4.2 // indirect
 	github.com/aliyun/aliyun-log-go-sdk v0.1.19
 	github.com/aliyunmq/mq-http-go-sdk v1.0.3
 	github.com/apache/dubbo-go-hessian2 v1.9.1
