@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"net/http"
+	"net/http/pprof"
 	"strconv"
 
 	"github.com/glory-go/glory/config"
@@ -29,6 +30,11 @@ func NewHttpService(name string, enableMetrics bool) *HttpService {
 
 	if enableMetrics {
 		httpService.RegisterRouterWithRawHttpHandler("/metrics", promhttp.Handler().ServeHTTP, http.MethodGet)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/", pprof.Index)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/cmdline", pprof.Cmdline)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/profile", pprof.Profile)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/symbol", pprof.Symbol)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/trace", pprof.Trace)
 	}
 	return httpService
 }
@@ -58,8 +64,12 @@ func (hs *HttpService) Run(ctx context.Context) {
 	s.Run(":" + strconv.Itoa(hs.conf.addr.Port))
 }
 
-func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler func(w http.ResponseWriter, r *http.Request), method string) {
-	hs.router.HandleFunc(path, handler).Methods(method)
+func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler func(w http.ResponseWriter, r *http.Request), method ...string) {
+	r := hs.router.HandleFunc(path, handler)
+	// 未传method则match all
+	if len(method) != 0 {
+		r.Methods(method...)
+	}
 }
 
 // RegisterRouter 对用户暴露的接口
