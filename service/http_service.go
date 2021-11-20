@@ -31,6 +31,7 @@ func NewHttpService(name string, enableMetrics bool) *HttpService {
 	if enableMetrics {
 		httpService.RegisterRouterWithRawHttpHandler("/metrics", promhttp.Handler().ServeHTTP, http.MethodGet)
 		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/{action}", pprof.Index)
+		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/", pprof.Index)
 		httpService.RegisterRouterWithRawHttpHandler("/debug/pprof/symbol", pprof.Symbol)
 	}
 	return httpService
