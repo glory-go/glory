@@ -9,6 +9,7 @@ import (
 	ghttp "github.com/glory-go/glory/http"
 	"github.com/glory-go/glory/service/middleware/jaeger"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/urfave/negroni"
 )
 
@@ -20,11 +21,15 @@ type HttpService struct {
 	gloryMWs []ghttp.Filter
 }
 
-func NewHttpService(name string) *HttpService {
+func NewHttpService(name string, enableMetrics bool) *HttpService {
 	httpService := &HttpService{}
 	httpService.name = name
 	httpService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	httpService.setup()
+
+	if enableMetrics {
+		httpService.RegisterRouterWithRawHttpHandler("/metrics", promhttp.Handler().ServeHTTP, http.MethodGet)
+	}
 	return httpService
 }
 
