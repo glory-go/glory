@@ -1,6 +1,7 @@
 package mq
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -11,7 +12,7 @@ var (
 	mqTypeMap sync.Map
 )
 
-type MQMsgHandler func([]byte) error
+type MQMsgHandler func(context.Context, []byte) error
 
 type MQServiceFactory func(rawConfig map[string]string) (MQService, error)
 
@@ -19,7 +20,7 @@ type MQService interface {
 	Connect() error
 	Send(topic string, msg []byte) (msgID string, err error)
 	DelaySend(topic string, msg []byte, handleTime time.Time) (msgID string, err error)
-	RegisterHandler(topic string, handler MQMsgHandler) error
+	RegisterHandler(topic string, handler MQMsgHandler)
 }
 
 func RegisterMQType(mqType string, mqFactory MQServiceFactory) {
