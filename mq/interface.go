@@ -16,7 +16,7 @@ type MQMsgHandler func([]byte) error
 type MQServiceFactory func(rawConfig map[string]string) (MQService, error)
 
 type MQService interface {
-	Connect() error // 根据配置进行mq的连接操作
+	Connect() error
 	Send(topic string, msg []byte) (msgID string, err error)
 	DelaySend(topic string, msg []byte, handleTime time.Time) (msgID string, err error)
 	RegisterHandler(topic string, handler MQMsgHandler) error

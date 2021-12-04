@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/glory-go/glory/common"
+	"gopkg.in/yaml.v3"
 
 	"github.com/rs/xid"
 	//"github.com/glory-go/glory/log" 不能用这个
@@ -139,4 +140,16 @@ func ReadMapConfigFromEnv(rawConfig map[string]string) map[string]string {
 		}
 	}
 	return rawConfig
+}
+
+func YamlStructConverter(from, to interface{}) error {
+	tmp, err := yaml.Marshal(from)
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(tmp, to)
+	if err != nil {
+		return err
+	}
+	return nil
 }
