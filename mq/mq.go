@@ -2,6 +2,7 @@ package mq
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
@@ -62,4 +63,12 @@ func StartOnMQMsgHandler(rbmqServiceName, channelName string, hanlder MQMsgHandl
 		return err
 	}
 	return nil
+}
+
+func GetMQInstance(name string) MQService {
+	srv, ok := mqInstance[name]
+	if !ok {
+		panic(fmt.Sprintf("mq with name %s not found", name))
+	}
+	return srv
 }
