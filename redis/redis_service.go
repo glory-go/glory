@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/glory-go/glory/log"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 
 	"github.com/glory-go/glory/config"
 	_ "github.com/go-sql-driver/mysql"
