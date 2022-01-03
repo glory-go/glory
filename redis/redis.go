@@ -5,7 +5,7 @@ import (
 
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 func init() {
