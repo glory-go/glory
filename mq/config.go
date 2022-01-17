@@ -9,10 +9,6 @@ import (
 
 var mqInstance = map[string]MQService{}
 
-func init() {
-	loadConfig(config.GlobalServerConf.MQConfig)
-}
-
 func loadConfig(mqConfigs map[string]*config.MQConfig) {
 	for name, config := range mqConfigs {
 		if config.ConfigSource == "env" {
