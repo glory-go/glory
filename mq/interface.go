@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 )
 
@@ -28,6 +29,8 @@ func RegisterMQType(mqType string, mqFactory MQServiceFactory) {
 	if ok {
 		log.Warnf("mq type [%s] has already been registered, now replace earlier one")
 	}
+	
+	loadConfig(config.GlobalServerConf.MQConfig)
 }
 
 func getMQFactory(mqType string) (MQServiceFactory, bool) {
