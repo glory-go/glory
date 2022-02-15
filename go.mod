@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
+	github.com/alexflint/go-arg v1.4.2
 	github.com/aliyun/aliyun-log-go-sdk v0.1.19
 	github.com/aliyunmq/mq-http-go-sdk v1.0.3
 	github.com/apache/dubbo-go-hessian2 v1.9.1
@@ -30,7 +31,7 @@ require (
 	github.com/opentracing-contrib/go-stdlib v1.0.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.9.0
+	github.com/prometheus/client_golang v1.11.0
 	github.com/qiniu/api.v7/v7 v7.8.0
 	github.com/rs/xid v1.2.1
 	github.com/spf13/viper v1.8.1

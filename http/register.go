@@ -46,7 +46,7 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 			if e := recover(); e != nil {
 				buf := make([]byte, 1024)
 				buf = buf[:runtime.Stack(buf, false)]
-				log.Panic(e, buf)
+				log.Panic(e, string(buf))
 				retPkg.SetErrorPkg(w, errors.New("server panic"), DefaultHttpErrorCode)
 			}
 		}()
@@ -107,7 +107,7 @@ func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.Respons
 			if e := recover(); e != nil {
 				buf := make([]byte, 1024)
 				buf = buf[:runtime.Stack(buf, false)]
-				log.Panic(e, buf)
+				log.Panic(e, string(buf))
 				retPkg.SetErrorPkg(w, errors.New("server panic"), DefaultHttpErrorCode)
 			}
 		}()
@@ -139,6 +139,10 @@ func checkMethod(method string) (string, bool) {
 		method == "patch" || method == "put" {
 		return strings.ToUpper(method), true
 	}
+	// 空方法match all
+	if method == "" {
+		return "", true
+	}
 	return "", false
 }
 
@@ -150,7 +154,10 @@ func RegisterRouter(path string, r *mux.Router, handler func(*GRegisterControlle
 		log.Panic("RegisterRouter: method unsupported")
 		return
 	}
-	r.HandleFunc(path, gloryHttpHandler).Methods(afterCheckedMethod)
+	mr := r.HandleFunc(path, gloryHttpHandler)
+	if afterCheckedMethod != "" {
+		mr.Methods(afterCheckedMethod)
+	}
 }
 
 func RegisterWSRouter(path string, r *mux.Router, handler func(*GRegisterWSController)) {
