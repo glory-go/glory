@@ -21,6 +21,8 @@ type ServerConfig struct {
 	RegistryConfig map[string]*RegistryConfig `yaml:"registry"`
 	// MysqlConfigs Mysql 数据库配置
 	MysqlConfigs map[string]*MysqlConfig `yaml:"mysql"`
+	// NebulaConfigs Nebula Graph 数据库配置
+	NebulaConfigs map[string]*NebulaConfig `yaml:"nebula"`
 	// RedisConfig redis 配置
 	RedisConfig map[string]*RedisConfig `yaml:"redis"`
 	// K8SConfig K8s配置
@@ -101,7 +103,7 @@ func (s *ServerConfig) checkAndFix() {
 		}
 	}
 	if s.OrgName == "" {
-		panic("please add your service org_name in config file from: classroom|ide|children|goonline")
+		panic("please add your service org_name in config file like: classroom|ide|children|goonline")
 	}
 
 	if s.ServerName == "" {

@@ -41,6 +41,7 @@ require (
 	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
 	github.com/valyala/fasthttp v1.24.0 // indirect
+	github.com/vesoft-inc/nebula-go/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.4.4
 	go.uber.org/atomic v1.9.0
 	go.uber.org/multierr v1.7.0 // indirect

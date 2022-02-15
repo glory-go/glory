@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"errors"
-
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 )
@@ -33,15 +31,6 @@ func newMysqlHandler() *MysqlHandler {
 	return &MysqlHandler{
 		mysqlServices: make(map[string]*MysqlService),
 	}
-}
-
-func RegisterModel(mysqlServiceName string, model UserDefinedModel) (*MysqlTable, error) {
-	service, ok := defaultMysqlHandler.mysqlServices[mysqlServiceName]
-	if !ok {
-		log.Error("mysql service name = ", mysqlServiceName, " not setup successful")
-		return nil, errors.New("mysql service name = " + mysqlServiceName + " not setup successful")
-	}
-	return service.registerModel(model)
 }
 
 func GetService(mysqlServiceName string) (*MysqlService, bool) {
