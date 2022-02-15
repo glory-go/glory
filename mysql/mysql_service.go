@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"errors"
-
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/service/middleware/jaeger"
 	"gorm.io/gorm"
@@ -13,15 +11,12 @@ import (
 
 // MysqlService 保存单个mysql链接
 type MysqlService struct {
-	DB     *gorm.DB
-	tables map[string]*MysqlTable
-	conf   config.MysqlConfig
+	DB   *gorm.DB
+	conf config.MysqlConfig
 }
 
 func newMysqlService() *MysqlService {
-	return &MysqlService{
-		tables: make(map[string]*MysqlTable),
-	}
+	return &MysqlService{}
 }
 
 func getMysqlLinkStr(conf config.MysqlConfig) string {
@@ -52,23 +47,4 @@ func (ms *MysqlService) openDB(conf config.MysqlConfig) error {
 		return nil
 	}
 	return nil
-}
-
-func (ms *MysqlService) registerModel(model UserDefinedModel) (*MysqlTable, error) {
-	table := newMysqlTable(ms.DB)
-	if err := table.registerModel(model); err != nil {
-		log.Error("mysql service register model err")
-		return nil, err
-	}
-
-	return table, nil
-}
-
-func (ms *MysqlService) GetTable(tableName string) (*MysqlTable, error) {
-	table, ok := ms.tables[tableName]
-	if !ok {
-		log.Error("table name = ", tableName, " not registered")
-		return nil, errors.New("table name = " + tableName + " not registered")
-	}
-	return table, nil
 }
