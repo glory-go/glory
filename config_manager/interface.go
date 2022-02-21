@@ -1,7 +1,5 @@
 package configmanager
 
-import "github.com/spf13/viper"
-
 type ConfigCenter interface {
 	// LoadConfig 从配置中心获取配置
 	LoadConfig(key string) (string, error)
@@ -9,4 +7,4 @@ type ConfigCenter interface {
 	SyncConfig(key string, value *string) error
 }
 
-type ConfigCenterBuilder func(conf *viper.Viper) (ConfigCenter, error)
+type ConfigCenterBuilder func(map[string]string) (ConfigCenter, error)

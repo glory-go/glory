@@ -11,13 +11,15 @@ var (
 	configCenterViperInstance *viper.Viper
 )
 
-func RegisterConfigBuilder(builder ConfigCenterBuilder) error {
+func RegisterConfigBuilder(configCenterName string, builder ConfigCenterBuilder) error {
 	if configCenter != nil {
 		return fmt.Errorf("only allow one config center builder")
 	}
+	config := configCenterViperInstance.GetStringMapString(configCenterName)
+	// TODO: 从env中替换内容
 	// 初始化配置中心
 	var err error
-	configCenter, err = builder(configCenterViperInstance)
+	configCenter, err = builder(config)
 	if err != nil {
 		return err
 	}

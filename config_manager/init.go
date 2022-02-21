@@ -40,7 +40,7 @@ func loadConfigCenterConfig() {
 
 	viperInstance := viper.GetViper()
 	viperInstance.SetConfigFile(path)
-	if err := viper.ReadInConfig(); err != nil {
+	if err := viperInstance.ReadInConfig(); err != nil {
 		log.Panic("load config center meets error", err)
 	}
 	configCenterViperInstance = viperInstance
