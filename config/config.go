@@ -15,18 +15,12 @@ import (
 // EnvKeyGloryConfigPath is absolute/relate path to glory.yaml
 const EnvKeyGloryConfigPath = "GLORY_CONFIG_PATH" // default val is "config/glory.yaml"
 
-const EnvKeyGloryConfigCenterPath = "GLORY_CONFIG_CENTER_PATH" // default val is "config/config_center.yaml"
-
 // EnvKeyGloryEnv if is set to dev,then:
 // 1. choose config center with namespace dev
 // 2. choose config path like "config/glory_dev.yaml
 const EnvKeyGloryEnv = "GLORY_ENV" //
 
-// EnvKeyGloryConfigCenterConfigPath is absolute/relate path to glory_config_center.yaml
-const EnvKeyGloryConfigCenterConfigPath = "GLORY_CONFIG_CENTER_CONFIG_PATH"
-
 const DefaultConfigPath = "config/glory.yaml"
-const DefaultConfigCenterConfigPath = "config/config_center.yaml"
 
 var GlobalServerConf *ServerConfig
 
@@ -41,28 +35,6 @@ func GetConfigPath() string {
 	configFilePath := DefaultConfigPath
 	if os.Getenv(EnvKeyGloryConfigPath) != "" {
 		configFilePath = os.Getenv(EnvKeyGloryConfigPath)
-	}
-	prefix := strings.Split(configFilePath, ".yaml")
-	// prefix == ["config/glory", ""]
-	if len(prefix) != 2 {
-		panic("Invalid config file path = " + configFilePath)
-	}
-	// get target env yaml file
-	if env != "" {
-		configPath = prefix[0] + "_" + env + ".yaml"
-	} else {
-		configPath = configFilePath
-	}
-	return configPath
-}
-
-func GetConfigCenterPath() string {
-	configPath := ""
-	env := os.Getenv(EnvKeyGloryEnv)
-
-	configFilePath := DefaultConfigPath
-	if os.Getenv(EnvKeyGloryConfigCenterPath) != "" {
-		configFilePath = os.Getenv(EnvKeyGloryConfigCenterPath)
 	}
 	prefix := strings.Split(configFilePath, ".yaml")
 	// prefix == ["config/glory", ""]
@@ -101,51 +73,7 @@ func loadFileConfig() error {
 	return nil
 }
 
-// oadConfigCenterConfig load config center's config from file, default is config/config_center_config.yaml
-func loadConfigCenterConfig() bool {
-	configCenterPath := GetConfigCenterPath()
-	yamlFile, err := ioutil.ReadFile(configCenterPath)
-	if err != nil {
-		fmt.Println("config center info: can't load config center config at " + DefaultConfigCenterConfigPath)
-		return false
-	}
-	configCenterConfig := ConfigCenterConfig{}
-	err = yaml.Unmarshal(yamlFile, &configCenterConfig)
-	if err != nil {
-		fmt.Printf("error: Unmarshal config center config err: %v\n", err)
-		return false
-	}
-	configCenterConfig.checkAndFix()
-	// TODO: 扩展支持更多的配置中心
-	if configCenterConfig.Name != "nacos" && configCenterConfig.Name != "" {
-		fmt.Println("error: config center name ", configCenterConfig.Name, "not support")
-		return false
-	}
-
-	// new config center
-	env := os.Getenv(EnvKeyGloryEnv)
-	if env == "" {
-		panic("please config GLORY_ENV environment variable")
-	}
-	nacosConfigCenter := newNacosConfigCenter(env)
-	if err := nacosConfigCenter.Conn(&configCenterConfig); err != nil {
-		fmt.Println("error: config center", configCenterConfig.Name, "Conn err = ", err)
-		return false
-	}
-	if cfg, err := nacosConfigCenter.LoadConfig(); err != nil {
-		fmt.Println("error: config center ", configCenterConfig.Name, "LoadConfig err = ", err)
-		return false
-	} else {
-		GlobalServerConf = cfg
-		fmt.Println("error: load config from remote config center successful")
-		return true
-	}
-}
-
 func init() {
-	if ok := loadConfigCenterConfig(); ok {
-		return
-	}
 	if err := loadFileConfig(); err != nil {
 		fmt.Printf("load conf from file failed with err =  %s, try to load from default config\n", err)
 		loadDefaultConfig()
