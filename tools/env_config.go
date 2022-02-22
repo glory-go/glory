@@ -65,6 +65,7 @@ func ReadFromEnvIfNeed(rawConfig interface{}) error {
 	return nil
 }
 
+
 // readAllConfFromEnv 提供从环境变量拉取的服务
 // 对于传入的rawConfig结构所有yaml标签不为config_source 的字段，尝试从环境变量中拉取，如果拉取到则替换原有值
 func readAllConfFromEnv(rawConfig interface{}) {

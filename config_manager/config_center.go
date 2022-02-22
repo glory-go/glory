@@ -16,7 +16,7 @@ func RegisterConfigBuilder(configCenterName string, builder ConfigCenterBuilder)
 		return fmt.Errorf("only allow one config center builder")
 	}
 	config := configCenterViperInstance.GetStringMapString(configCenterName)
-	// TODO: 从env中替换内容
+	ReadFromEnvIfNeed(config)
 	// 初始化配置中心
 	var err error
 	configCenter, err = builder(config)
