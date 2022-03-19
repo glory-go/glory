@@ -8,7 +8,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var once sync.Once
+var (
+	once   sync.Once
+	inited bool
+)
 
 // value of env keys can be changed from environment
 
@@ -54,5 +57,6 @@ func loadFileConfig() {
 func Init() {
 	once.Do(func() {
 		loadFileConfig()
+		inited = true
 	})
 }

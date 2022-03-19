@@ -26,7 +26,9 @@ func RegisterConfig(name string, builder ComponentBuilder) error {
 }
 
 func InitModules(modules ...string) error {
-	Init()
+	if !inited {
+		return fmt.Errorf("config not inited yet")
+	}
 	for _, module := range modules {
 		builderI, ok := builderMap.Load(module)
 		if !ok {

@@ -10,11 +10,15 @@ import (
 	"github.com/spf13/viper"
 )
 
-var once sync.Once
+var (
+	once   sync.Once
+	inited bool
+)
 
 func Init() {
 	once.Do(func() {
 		loadConfigCenterConfig()
+		inited = true
 	})
 }
 

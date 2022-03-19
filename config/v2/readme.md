@@ -2,7 +2,7 @@
 
 ## 使用
 
-**初始化前，应先初始化`config_manager`包**
+**初始化前，应先初始化`config_manager`包，且调用config包的`Init()`方法完成手动初始化**
 
 应用的main函数中，引入各个模块(mysql、redis等)后，并确保各个模块完成了注册(一般在init方法中，或需要手动Init)，调用`InitModules(modules ...string) error`方法进行各个模块的初始化操作
 

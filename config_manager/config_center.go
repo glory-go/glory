@@ -29,7 +29,9 @@ func RegisterConfigBuilder(configCenterName string, builder ConfigCenterBuilder)
 }
 
 func InitConfigCenter(configCenterName ...string) error {
-	Init()
+	if !inited {
+		return fmt.Errorf("config center not inited")
+	}
 	for _, name := range configCenterName {
 		builderI, ok := configCenterBuilderMap.Load(configCenterName)
 		if !ok {
@@ -54,6 +56,9 @@ func InitConfigCenter(configCenterName ...string) error {
 }
 
 func GetConfigCenter(configCenterName string) (ConfigCenter, error) {
+	if !inited {
+		return nil, fmt.Errorf("config center not register yet")
+	}
 	configCenter, ok := configCenterMap.Load(configCenterName)
 	if !ok || configCenter == nil {
 		return nil, fmt.Errorf("config center %s not registered", configCenterName)

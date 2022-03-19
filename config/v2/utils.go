@@ -24,7 +24,9 @@ func ReplaceStringValueFromConfigCenter(conf map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	conf = tmp
+	for k, v := range tmp {
+		conf[k] = v
+	}
 	return nil
 }
 
@@ -35,11 +37,11 @@ func replaceMapValueFromConfigCenter(configSource string, conf map[string]interf
 			err error
 			val interface{}
 		)
-		switch v.(type) {
+		switch v := v.(type) {
 		case map[string]interface{}:
-			val, err = replaceMapValueFromConfigCenter(configSource, v.(map[string]interface{}))
+			val, err = replaceMapValueFromConfigCenter(configSource, v)
 		case string:
-			val, err = replaceStringValueFromConfigCenter(configSource, v.(string))
+			val, err = replaceStringValueFromConfigCenter(configSource, v)
 		default:
 			continue
 		}
