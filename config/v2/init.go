@@ -3,9 +3,12 @@ package config
 import (
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/spf13/viper"
 )
+
+var once sync.Once
 
 // value of env keys can be changed from environment
 
@@ -48,6 +51,8 @@ func loadFileConfig() {
 	ConfigInstance.AddConfigPath(configPath)
 }
 
-func init() {
-	loadFileConfig()
+func Init() {
+	once.Do(func() {
+		loadFileConfig()
+	})
 }

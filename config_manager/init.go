@@ -4,13 +4,18 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/glory-go/glory/common"
 	"github.com/spf13/viper"
 )
 
-func init() {
-	loadConfigCenterConfig()
+var once sync.Once
+
+func Init() {
+	once.Do(func() {
+		loadConfigCenterConfig()
+	})
 }
 
 func GetConfigCenterPath() string {

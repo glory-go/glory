@@ -1,6 +1,10 @@
 # 配置中心
 
-## 使用方法
+## 使用
+
+应用的main函数中，引入各个配置中心(如：nacos)后，并确保各个模块完成了注册(一般在init方法中，或需要手动Init)，调用`InitConfigCenter(configCenterName ...string) error`方法进行各个模块的初始化操作
+
+## 配置管理
 
 ### 配置文件路径
 
