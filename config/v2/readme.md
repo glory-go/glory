@@ -7,9 +7,10 @@
 应用的main函数中，引入各个模块(mysql、redis等)后，并确保各个模块完成了注册(一般在init方法中，或需要手动Init)，调用`InitModules(modules ...string) error`方法进行各个模块的初始化操作
 
 ## 配置管理
+
 ### 配置文件路径
 
-`config/config_{GLORY_ENV}.yaml`，`GLORY_ENV`为环境变量，配置中心的配置会基于该环境变量进行读取
+`config/config_{GLORY_ENV}.v2.yaml`，`GLORY_ENV`为环境变量，配置中心的配置会基于该环境变量进行读取
 
 ### 自定义配置内容
 

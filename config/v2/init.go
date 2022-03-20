@@ -23,7 +23,7 @@ const EnvKeyGloryConfigPath = "GLORY_CONFIG_PATH" // default val is "config/glor
 // 2. choose config path like "config/glory_dev.yaml
 const EnvKeyGloryEnv = "GLORY_ENV" //
 
-const DefaultConfigPath = "config/glory.yaml"
+const DefaultConfigPath = "config/glory.v2.yaml"
 
 func GetConfigPath() string {
 	configPath := ""
@@ -33,14 +33,14 @@ func GetConfigPath() string {
 	if os.Getenv(EnvKeyGloryConfigPath) != "" {
 		configFilePath = os.Getenv(EnvKeyGloryConfigPath)
 	}
-	prefix := strings.Split(configFilePath, ".yaml")
+	prefix := strings.Split(configFilePath, ".v2.yaml")
 	// prefix == ["config/glory", ""]
 	if len(prefix) != 2 {
 		panic("Invalid config file path = " + configFilePath)
 	}
 	// get target env yaml file
 	if env != "" {
-		configPath = prefix[0] + "_" + env + ".yaml"
+		configPath = prefix[0] + "_" + env + ".v2.yaml"
 	} else {
 		configPath = configFilePath
 	}
