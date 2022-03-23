@@ -12,7 +12,7 @@ import (
 )
 
 type httpProtocolService struct {
-	serviceBase
+	DefaultServiceBase
 	httpProtocolServiceImpl interface{}
 }
 
@@ -20,8 +20,8 @@ func NewHTTPProtocolService(name string, serviceProvider interface{}) *httpProto
 	newHTTPProtocolService := &httpProtocolService{
 		httpProtocolServiceImpl: serviceProvider,
 	}
-	newHTTPProtocolService.name = name
-	newHTTPProtocolService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
+	newHTTPProtocolService.Name = name
+	newHTTPProtocolService.LoadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	return newHTTPProtocolService
 }
 

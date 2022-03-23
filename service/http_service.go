@@ -13,7 +13,7 @@ import (
 )
 
 type HttpService struct {
-	serviceBase
+	DefaultServiceBase
 	router *mux.Router
 
 	mws      []negroni.Handler
@@ -22,8 +22,8 @@ type HttpService struct {
 
 func NewHttpService(name string) *HttpService {
 	httpService := &HttpService{}
-	httpService.name = name
-	httpService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
+	httpService.Name = name
+	httpService.LoadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	httpService.setup()
 	return httpService
 }

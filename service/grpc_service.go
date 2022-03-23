@@ -16,7 +16,7 @@ import (
 )
 
 type GrpcService struct {
-	serviceBase
+	DefaultServiceBase
 	grpcServer *grpc.Server
 
 	unaryMWs []grpc.UnaryServerInterceptor
@@ -24,8 +24,8 @@ type GrpcService struct {
 
 func NewGrpcService(name string) *GrpcService {
 	newgrpcService := &GrpcService{}
-	newgrpcService.name = name
-	newgrpcService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
+	newgrpcService.Name = name
+	newgrpcService.LoadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	newgrpcService.setup()
 	return newgrpcService
 }

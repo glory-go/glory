@@ -13,13 +13,13 @@ import (
 )
 
 type jsonRPCService struct {
-	serviceBase
+	DefaultServiceBase
 }
 
 func NewJsonRPCService(name string) *jsonRPCService {
 	newJsonRPCService := &jsonRPCService{}
-	newJsonRPCService.name = name
-	newJsonRPCService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
+	newJsonRPCService.Name = name
+	newJsonRPCService.LoadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	return newJsonRPCService
 }
 

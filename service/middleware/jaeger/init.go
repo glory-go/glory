@@ -20,6 +20,10 @@ var (
 	tracer opentracing.Tracer
 )
 
+func GetTracer() opentracing.Tracer {
+	return tracer
+}
+
 type aliyunJaegerConfig struct {
 	ConfigSource string `mapstructure:"config_source"`
 	Endpoint     string `mapstructure:"endpoint"`

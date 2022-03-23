@@ -12,7 +12,7 @@ import (
 )
 
 type gloryService struct {
-	serviceBase
+	DefaultServiceBase
 	gloryServiceImpl interface{}
 }
 
@@ -20,8 +20,8 @@ func NewGloryService(name string, serviceProvider interface{}) *gloryService {
 	newgrpcService := &gloryService{
 		gloryServiceImpl: serviceProvider,
 	}
-	newgrpcService.name = name
-	newgrpcService.loadConfig(config.GlobalServerConf.ServiceConfigs[name])
+	newgrpcService.Name = name
+	newgrpcService.LoadConfig(config.GlobalServerConf.ServiceConfigs[name])
 	return newgrpcService
 }
 

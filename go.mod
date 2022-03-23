@@ -9,6 +9,7 @@ require (
 	github.com/apache/dubbo-go-hessian2 v1.9.1
 	github.com/dubbogo/gost v1.11.3
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
@@ -27,6 +28,7 @@ require (
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/olivere/elastic/v7 v7.0.22
+	github.com/opentracing-contrib/go-gin v0.0.0-20201220185307-1dd2273433a4
 	github.com/opentracing-contrib/go-stdlib v1.0.0
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pkg/errors v0.9.1
@@ -38,7 +40,6 @@ require (
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
-	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
 	github.com/valyala/fasthttp v1.24.0 // indirect
 	go.mongodb.org/mongo-driver v1.4.4
