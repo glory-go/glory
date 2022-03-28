@@ -21,6 +21,8 @@ mq:
             key: value
 ```
 
+5. 调用`mq.Init()`方法，初始化mq配置
+
 完成以上步骤后，可在代码中通过`mq.GetMQInstance("mq_name")`，获取你在配置中定义的mq实例
 
 ## 支持能力
