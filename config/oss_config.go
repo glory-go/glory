@@ -16,8 +16,9 @@ type OssConfig struct {
 	OssAccessKey  string `yaml:"oss_access_key"`
 	OssSecretKey  string `yaml:"oss_secret_key"`
 	// 阿里云
-	RoleArn  string `yaml:"role_arn"`
-	Endpoint string `yaml:"endpoint"`
+	RoleArn       string `yaml:"role_arn"`
+	Endpoint      string `yaml:"endpoint"`
+	InnerEndpoint string `yaml:"inner_endpoint"` // 内网端点
 }
 
 func (s *OssConfig) checkAndFix() {
