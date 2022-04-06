@@ -21,7 +21,7 @@ type MQService interface {
 	Connect() error
 	Send(topic string, msg []byte) (msgID string, err error)
 	DelaySend(topic string, msg []byte, handleTime time.Time) (msgID string, err error)
-	Publish(topic string, msg []byte) error
+	Publish(topic string, msg []byte) (msgID string, err error)
 	RegisterHandler(topic string, handler MQMsgHandler)
 }
 
