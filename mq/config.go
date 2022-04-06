@@ -18,7 +18,7 @@ func loadConfig(mqConfigs map[string]*config.MQConfig) {
 		if !ok {
 			panic(fmt.Sprintf("mq with type %s not register", config.Type))
 		}
-		instance, err := factory(config.Config)
+		instance, err := factory(config.Mod, config.Config)
 		if err != nil {
 			panic(fmt.Sprintf("fail to load config for mq %s, err is %v", name, err))
 		}
