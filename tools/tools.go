@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/glory-go/glory/common"
+	"gopkg.in/yaml.v3"
 
 	"github.com/rs/xid"
 	//"github.com/glory-go/glory/log" 不能用这个
@@ -77,6 +78,9 @@ func readAllConfFromEnv(rawConfig interface{}) {
 		//fmt.Printf("Field %d:值=%v\n", i, val.Elem().Field(i))
 		tagVal := typ.Elem().Field(i).Tag.Get("yaml")
 		//如果该字段有tag标签就显示，否则就不显示
+		if val.Elem().Field(i).Kind() != reflect.String {
+			continue
+		}
 		if envValue := GetEnv(val.Elem().Field(i).String()); tagVal != "config_source" && envValue != "" {
 			// 非config字段，并且环境变量里面有定义
 			val.Elem().Field(i).SetString(envValue)
@@ -127,4 +131,25 @@ func AddrLabel2Addr(addrLabel string) common.Address {
 // GenerateXID generate unique id
 func GenerateXID() string {
 	return xid.New().String()
+}
+
+func ReadMapConfigFromEnv(rawConfig map[string]string) map[string]string {
+	for k, v := range rawConfig {
+		if v = GetEnv(v); v != "" {
+			rawConfig[k] = v
+		}
+	}
+	return rawConfig
+}
+
+func YamlStructConverter(from, to interface{}) error {
+	tmp, err := yaml.Marshal(from)
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(tmp, to)
+	if err != nil {
+		return err
+	}
+	return nil
 }

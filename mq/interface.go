@@ -1,19 +1,43 @@
 package mq
 
 import (
+	"context"
+	"sync"
 	"time"
 
-	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
-// TODO: 抽象出收到的消息的通用方法
-type MQMsgHandler func([]byte) error
+var (
+	mqTypeMap sync.Map
+)
+
+type MQMsgHandler func(context.Context, []byte) error
+
+type MQServiceFactory func(rawConfig map[string]string) (MQService, error)
 
 type MQService interface {
-	loadConfig(conf *config.MQConfig) error
-	// 返回MsgID
-	Send(topic string, msg []byte) (string, error)
-	DelaySend(topic string, msg []byte, handleTime time.Time) (string, error)
-	// Handler 函数的调用会阻塞进程
-	Handler(topic string, handler MQMsgHandler) error
+	Connect() error
+	Send(topic string, msg []byte) (msgID string, err error)
+	DelaySend(topic string, msg []byte, handleTime time.Time) (msgID string, err error)
+	RegisterHandler(topic string, handler MQMsgHandler)
+}
+
+func RegisterMQType(mqType string, mqFactory MQServiceFactory) {
+	_, ok := mqTypeMap.LoadOrStore(mqType, mqFactory)
+	if ok {
+		log.Warnf("mq type [%s] has already been registered, now replace earlier one")
+	}
+}
+
+func getMQFactory(mqType string) (MQServiceFactory, bool) {
+	v, ok := mqTypeMap.Load(mqType)
+	if !ok || v == nil {
+		return nil, false
+	}
+	factory, ok := v.(MQServiceFactory)
+	if !ok || factory == nil {
+		return nil, false
+	}
+	return factory, true
 }

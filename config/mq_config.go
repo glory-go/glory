@@ -15,23 +15,10 @@ const (
 )
 
 type MQConfig struct {
-	// common
-	Type string `yaml:"type"` // 使用的MQ类型
+	Type         string `yaml:"type"` // 使用的MQ类型
+	ConfigSource string `yaml:"config_source"`
 
-	ConfigSource string                           `yaml:"config_source"`
-	Host         string                           `yaml:"host"`
-	Port         string                           `yaml:"port"`
-	Username     string                           `yaml:"username"`
-	Password     string                           `yaml:"password"`
-	AutoACK      bool                             `yaml:"auto_ack"`
-	Channels     map[string]RabbitMQChannelConfig `yaml:"channels"` // key是这个队列我们指定的名称
-
-	// aliyun
-	Endpoint        string `yaml:"endpoint"`
-	AccessKey       string `yaml:"access_key"`
-	SecretKey       string `yaml:"secret_key"`
-	InstanceID      string `yaml:"instance_id"`
-	ConsumerGroupID string `yaml:"consumer_group_id"`
+	Config map[string]string `yaml:"config"` // 由具体的mq实现决定其内容如何解析
 }
 
 type RabbitMQChannelConfig struct {

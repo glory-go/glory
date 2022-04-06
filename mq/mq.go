@@ -1,65 +1,20 @@
 package mq
 
 import (
-	"errors"
-
-	"github.com/glory-go/glory/config"
-	"github.com/glory-go/glory/log"
-	"github.com/streadway/amqp"
+	"fmt"
 )
 
-func init() {
-	defaultRabbitMQHandler = newRabbitMQDefaultHandler()
-	defaultRabbitMQHandler.setup(config.GlobalServerConf.MQConfig)
-}
-
-type RabbitMQHandler struct {
-	mqServicesMap map[string]*RabbitMQService
-}
-
-var defaultRabbitMQHandler *RabbitMQHandler
-
-func (mh *RabbitMQHandler) setup(conf map[string]*config.MQConfig) {
-	for k, v := range conf {
-		tempService := newRabbitMQService()
-		tempService.loadConfig(*v)
-		if err := tempService.connect(); err != nil {
-			log.Error("opendb with key = ", k, " error = ", err)
-			continue
-		}
-		mh.mqServicesMap[k] = tempService
+func GetMQInstance(name string) MQService {
+	if !inited {
+		panic("mq not init, please call mq.Init() before get instance")
 	}
-}
-
-func newRabbitMQDefaultHandler() *RabbitMQHandler {
-	return &RabbitMQHandler{
-		mqServicesMap: make(map[string]*RabbitMQService),
-	}
-}
-
-func NewRabbitMQClient(rbmqServiceName string) (*amqp.Connection, error) {
-	service, ok := defaultRabbitMQHandler.mqServicesMap[rbmqServiceName]
+	srv, ok := mqInstance[name]
 	if !ok {
-		log.Error("rabbitmq service name = ", rbmqServiceName, " not registered in config")
-		return nil, errors.New("rabbitmq service name = " + rbmqServiceName + " not registered in config")
+		panic(fmt.Sprintf("mq with name %s not found", name))
 	}
-	return service.conn, nil
-}
-
-func GetService(rbmqServiceName string) (*RabbitMQService, bool) {
-	s, ok := defaultRabbitMQHandler.mqServicesMap[rbmqServiceName]
-	return s, ok
-}
-
-func StartOnMQMsgHandler(rbmqServiceName, channelName string, hanlder MQMsgHandler) error {
-	service, ok := defaultRabbitMQHandler.mqServicesMap[rbmqServiceName]
-	if !ok {
-		log.Error("rabbitmq service name = ", rbmqServiceName, " not registered in config")
-		return errors.New("rabbitmq service name = " + rbmqServiceName + " not registered in config")
+	err := srv.Connect()
+	if err != nil {
+		panic(fmt.Sprintf("fail to connect to mq with name %s, err is %v", name, err))
 	}
-	if err := service.startOnMsgHandler(channelName, hanlder); err != nil {
-		log.Error("rabbitmq service send to ", channelName, " queue err = ", err)
-		return err
-	}
-	return nil
+	return srv
 }
