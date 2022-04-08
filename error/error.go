@@ -15,6 +15,7 @@ var GloryFrameworkErrorTargetInvokerNotFound = &GloryFrameworkError{Code: -301, 
 type GloryFrameworkError struct {
 	Code int32
 	Msg  string
+	Desc string
 }
 
 func (g *GloryFrameworkError) Error() string {
