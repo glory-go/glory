@@ -22,7 +22,7 @@ func newMysqlTable(db *gorm.DB) *MysqlTable {
 func (mt *MysqlTable) registerModel(model UserDefinedModel) error {
 	mt.tableName = model.TableName()
 	mt.tableModel = model
-	mt.DB = mt.DB.Model(model)
+	mt.DB = mt.DB.Table(model.TableName())
 	return nil
 }
 
@@ -33,8 +33,8 @@ func (mt *MysqlTable) SelectWhere(queryStr string, result interface{}, args ...i
 	// todo reflect 检查result类型,只能是 &[]model{}
 	// TODO 既然被你看到了就由你来完善吧
 
-	if err := mt.DB.Model(mt.tableModel).Where(queryStr, args).Find(result); err != nil {
-		return err.Error
+	if err := mt.DB.Table(mt.tableModel.TableName()).Where(queryStr, args...).Find(result).Error; err != nil {
+		return err
 	}
 	return nil
 }
@@ -46,8 +46,8 @@ func (mt *MysqlTable) Insert(toInsertLines UserDefinedModel) error {
 	// todo reflect检查toInserLines类型，是数组则开多次插入
 	// TODO 既然被你看到了就由你来完善吧
 
-	if err := mt.DB.Model(mt.tableModel).Create(toInsertLines); err != nil {
-		return err.Error
+	if err := mt.DB.Table(mt.tableModel.TableName()).Create(toInsertLines).Error; err != nil {
+		return err
 	}
 	return nil
 }
@@ -58,8 +58,8 @@ func (mt *MysqlTable) Update(queryStr, field string, target interface{}, args ..
 	// todo reflect检查target 类型，是否与注册好的的field相符
 	// TODO 既然被你看到了就由你来完善吧
 
-	if err := mt.DB.Model(mt.tableModel).Where(queryStr, args).Update(field, target); err != nil {
-		return err.Error
+	if err := mt.DB.Table(mt.tableModel.TableName()).Where(queryStr, args...).Update(field, target).Error; err != nil {
+		return err
 	}
 	return nil
 }
@@ -70,8 +70,8 @@ func (mt *MysqlTable) Delete(toDeleteTarget UserDefinedModel) error {
 	// todo reflect检查toDeleteTarget 类型，确保所有字段不为空
 	// TODO 既然被你看到了就由你来完善吧
 
-	if err := mt.DB.Model(mt.tableModel).Delete(toDeleteTarget); err != nil {
-		return err.Error
+	if err := mt.DB.Table(mt.tableModel.TableName()).Delete(toDeleteTarget).Error; err != nil {
+		return err
 	}
 	return nil
 }
@@ -82,8 +82,8 @@ func (mt *MysqlTable) First(queryStr string, findTarget UserDefinedModel, args .
 	// todo reflect 检查findTarget类型 确保是注册类型的指针相同
 	// TODO 既然被你看到了就由你来完善吧
 
-	if err := mt.DB.Model(mt.tableModel).Where(queryStr, args).Find(findTarget); err != nil {
-		return err.Error
+	if err := mt.DB.Table(mt.tableModel.TableName()).Where(queryStr, args...).Find(findTarget).Error; err != nil {
+		return err
 	}
 	return nil
 }
