@@ -16,6 +16,7 @@
 mq:
     mq_name: # 自定义的名称
         type: aliyun_rocketmq # 目标mq实现中指定的类型
+        mod: normal|pubsub # 该mq使用什么消息模式
         config_source: env # 可选，包含该配置时，将从指定来源中解析mq配置，目前仅支持环境变量
         config: # 以下内容为用户自定义mq所消费
             key: value

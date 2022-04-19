@@ -7,6 +7,7 @@ import (
 
 	"github.com/glory-go/glory/config"
 	ghttp "github.com/glory-go/glory/http"
+	"github.com/glory-go/glory/service/middleware/common"
 	"github.com/glory-go/glory/service/middleware/jaeger"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -44,9 +45,11 @@ func (hs *HttpService) UseGloryMW(filters ...ghttp.Filter) {
 }
 
 func (hs *HttpService) Run(ctx context.Context) {
-	// handler := cors.Default().Handler(hs.router)
 	s := negroni.Classic()
 	for _, handler := range hs.mws {
+		s.Use(handler)
+	}
+	for _, handler := range common.GetNegroniMWs() {
 		s.Use(handler)
 	}
 	s.UseHandler(hs.router)
@@ -61,6 +64,7 @@ func (hs *HttpService) RegisterRouterWithRawHttpHandler(path string, handler fun
 func (hs *HttpService) RegisterRouter(path string, handler func(*ghttp.GRegisterController) error, req interface{},
 	rsp interface{}, method string, filters ...ghttp.Filter) {
 	filters = append(hs.gloryMWs, filters...)
+	filters = append(filters, common.GetGloryMWs()...)
 	ghttp.RegisterRouter(path, hs.router, handler, req, rsp, method, filters)
 }
 
