@@ -22,7 +22,6 @@ func newMysqlTable(db *gorm.DB) *MysqlTable {
 func (mt *MysqlTable) registerModel(model UserDefinedModel) error {
 	mt.tableName = model.TableName()
 	mt.tableModel = model
-	mt.DB = mt.DB.Table(model.TableName())
 	return nil
 }
 
