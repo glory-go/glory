@@ -46,7 +46,7 @@ func getGloryHttpHandler(handler func(*GRegisterController) error, req, rsp inte
 			if e := recover(); e != nil {
 				buf := make([]byte, 1024)
 				buf = buf[:runtime.Stack(buf, false)]
-				log.Panic(e, buf)
+				log.Panicf("%s\n%s\n", e, buf)
 				retPkg.SetErrorPkg(w, errors.New("server panic"), DefaultHttpErrorCode)
 			}
 		}()
@@ -107,7 +107,7 @@ func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.Respons
 			if e := recover(); e != nil {
 				buf := make([]byte, 1024)
 				buf = buf[:runtime.Stack(buf, false)]
-				log.Panic(e, buf)
+				log.Panicf("%s\n%s\n", e, buf)
 				retPkg.SetErrorPkg(w, errors.New("server panic"), DefaultHttpErrorCode)
 			}
 		}()
