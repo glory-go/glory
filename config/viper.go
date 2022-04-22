@@ -12,7 +12,7 @@ func init() {
 	viperInstance = viper.GetViper()
 	viperInstance.SetConfigFile(GetConfigPath())
 	if err := viper.ReadInConfig(); err != nil {
-		log.Panic("load config meets error", err)
+		log.Println("Fatal: load config meets error", err)
 	}
 }
 
