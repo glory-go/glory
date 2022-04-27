@@ -117,7 +117,8 @@ func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.Respons
 			}
 		}()
 		// 升级接口到websocket
-		conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+		upgrader := websocket.Upgrader{}
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
 		}
