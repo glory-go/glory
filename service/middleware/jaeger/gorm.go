@@ -3,10 +3,13 @@ package jaeger
 import (
 	"context"
 	"strings"
+)
 
-	jsoniter "github.com/json-iterator/go"
+import (
 	"github.com/opentracing/opentracing-go"
+
 	"gorm.io/gorm"
+
 	gormopentracing "gorm.io/plugin/opentracing"
 )
 
@@ -63,23 +66,16 @@ const (
 )
 
 const (
-	_prefix      = "gorm.opentracing"
-	_errorTagKey = "error"
+	_prefix = "gorm.opentracing"
 )
 
 var (
 	opentracingSpanKey = "opentracing:span"
-	json               = jsoniter.ConfigCompatibleWithStandardLibrary
 )
 
 var (
 	// span.Tag keys
 	_tableTagKey = keyWithPrefix("table")
-	// span.Log keys
-	//_errorLogKey        = keyWithPrefix("error")
-	_resultLogKey       = keyWithPrefix("result")
-	_sqlLogKey          = keyWithPrefix("sql")
-	_rowsAffectedLogKey = keyWithPrefix("rowsAffected")
 )
 
 func keyWithPrefix(key string) string {
@@ -206,10 +202,6 @@ func (t *GormTracer) extractAfter(db *gorm.DB) {
 
 // tag called after operation
 func tag(sp opentracing.Span, db *gorm.DB) {
-	if err := db.Error; err != nil {
-		// sp.SetTag(_errorTagKey, true)
-	}
-
 	sp.SetTag(_tableTagKey, db.Statement.Table)
 }
 

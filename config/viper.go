@@ -2,7 +2,9 @@ package config
 
 import (
 	"log"
+)
 
+import (
 	"github.com/spf13/viper"
 )
 

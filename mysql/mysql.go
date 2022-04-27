@@ -2,7 +2,9 @@ package mysql
 
 import (
 	"errors"
+)
 
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 )

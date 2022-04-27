@@ -2,11 +2,15 @@ package metrics
 
 import (
 	gxnet "github.com/dubbogo/gost/net"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/push"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/tools"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/push"
 )
 
 type PromePushService struct {

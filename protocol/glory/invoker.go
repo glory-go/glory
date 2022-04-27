@@ -22,12 +22,12 @@ import (
 	"reflect"
 	"sync"
 	"time"
+)
 
-	"github.com/glory-go/glory/config"
-
-	"github.com/glory-go/glory/log"
-
+import (
 	"github.com/glory-go/glory/common"
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
 type GloryInvoker struct {

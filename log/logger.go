@@ -2,17 +2,25 @@ package log
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
+)
 
-	"github.com/glory-go/glory/config"
+import (
 	"github.com/natefinch/lumberjack"
+
 	"github.com/olivere/elastic/v7"
+
 	"github.com/opentracing/opentracing-go"
+
 	"github.com/uber/jaeger-client-go"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+)
+
+import (
+	"github.com/glory-go/glory/config"
 )
 
 type LoggerConfig struct {
@@ -27,9 +35,8 @@ type LoggerConfig struct {
 
 //Logger 一个logger对应多个实例化zapcore，调用Logger的方法将作用于所有core，从而实现日志的多重记录
 type Logger struct {
-	config   map[string]*LoggerConfig
-	logger   []*zap.SugaredLogger
-	enconfig zapcore.EncoderConfig
+	config map[string]*LoggerConfig
+	logger []*zap.SugaredLogger
 }
 
 func GetTraceIDKey() string {
@@ -136,11 +143,11 @@ func getElasticSugaredLogger(level zapcore.Level, addr string, enconfig zapcore.
 	}
 
 	core := zapcore.NewTee(
-		zapcore.NewCore(encoder, zapcore.AddSync(ElasticDebugHook{es: es, serviceName: serviceName}), debugLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(ElasticInfoHook{es: es, serviceName: serviceName}), infoLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(ElasticWarnHook{es: es, serviceName: serviceName}), warnLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(ElasticErrorHook{es: es, serviceName: serviceName}), errorLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(ElasticPanicHook{es: es, serviceName: serviceName}), panicLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&ElasticDebugHook{es: es, serviceName: serviceName}), debugLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&ElasticInfoHook{es: es, serviceName: serviceName}), infoLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&ElasticWarnHook{es: es, serviceName: serviceName}), warnLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&ElasticErrorHook{es: es, serviceName: serviceName}), errorLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&ElasticPanicHook{es: es, serviceName: serviceName}), panicLevel),
 	)
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
 	return logger.Sugar()
@@ -159,8 +166,8 @@ func getConsoleSugaredLogger(level zapcore.Level, enconfig zapcore.EncoderConfig
 
 func getFileSugaredLogger(level zapcore.Level, filePath string, enconfig zapcore.EncoderConfig) *zap.SugaredLogger {
 	hook := &lumberjack.Logger{
-		Filename:   fmt.Sprintf(filePath), //filePath
-		MaxSize:    500,                   // megabytes
+		Filename:   filePath, //filePath
+		MaxSize:    500,      // megabytes
 		MaxBackups: 10000,
 		MaxAge:     100000, //days
 		Compress:   false,  // disabled by default
@@ -188,10 +195,10 @@ func getAliyunSLSLogger(level zapcore.Level, enconfig zapcore.EncoderConfig, con
 	return logger.Sugar()
 }
 
-func getremoteSugaredLogger(level zapcore.Level) *zap.SugaredLogger {
-	// todo 远程日志
-	return nil
-}
+// todo 远程日志
+//func getremoteSugaredLogger(level zapcore.Level) *zap.SugaredLogger {
+//return nil
+//}
 
 func getTraceIDFromUberCtx(ctx context.Context) (string, bool) {
 	span := opentracing.SpanFromContext(ctx)

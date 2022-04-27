@@ -1,12 +1,16 @@
 package k8s
 
 import (
-	"github.com/glory-go/glory/log"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 
+	"k8s.io/client-go/rest"
+
+	"k8s.io/client-go/tools/clientcmd"
+)
+
+import (
 	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
 // K8SService 保存该k8s的配置信息

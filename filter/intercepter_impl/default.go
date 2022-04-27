@@ -2,12 +2,17 @@ package intercepter_impl
 
 import (
 	"context"
+)
 
+import (
+	"google.golang.org/grpc"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/filter"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
-	"google.golang.org/grpc"
 )
 
 func NewDefaultGRPCIntercepter(filterKeys []string) (filter.Intercepter, error) {

@@ -2,13 +2,18 @@ package mysql
 
 import (
 	"errors"
+)
 
+import (
+	"gorm.io/driver/mysql"
+
+	"gorm.io/gorm"
+)
+
+import (
+	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/service/middleware/jaeger"
-	"gorm.io/gorm"
-
-	"github.com/glory-go/glory/config"
-	"gorm.io/driver/mysql"
 )
 
 // MysqlService 保存单个mysql链接

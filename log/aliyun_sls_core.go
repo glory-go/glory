@@ -5,11 +5,20 @@ import (
 	"strings"
 	"sync"
 	"time"
+)
 
+import (
 	sls "github.com/aliyun/aliyun-log-go-sdk"
-	"github.com/glory-go/glory/config"
+
 	"github.com/gogo/protobuf/proto"
+
+	"github.com/google/martian/log"
+
 	"go.uber.org/zap/zapcore"
+)
+
+import (
+	"github.com/glory-go/glory/config"
 )
 
 type aliyunSLSCore struct {
@@ -25,7 +34,7 @@ type aliyunSLSCore struct {
 	orgName    string
 	serverName string
 
-	lock               sync.RWMutex
+	lock               *sync.RWMutex
 	tickerTimeInterval time.Duration
 }
 
@@ -100,7 +109,9 @@ func (c *aliyunSLSCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 	if ent.Level > zapcore.ErrorLevel {
 		// Since we may be crashing the program, sync the output. Ignore Sync
 		// errors, pending a clean solution to issue #370.
-		c.Sync()
+		if err := c.Sync(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -137,16 +148,15 @@ func (c *aliyunSLSCore) clone() *aliyunSLSCore {
 	clone := *c
 	clone.enc = c.enc.Clone()
 	clone.out = c.out
-	clone.lock = sync.RWMutex{}
+	clone.lock = &sync.RWMutex{}
 	return &clone
 }
 
 func (c *aliyunSLSCore) runUpload() {
-	ticker := time.Tick(c.tickerTimeInterval)
-	for {
-		select {
-		case <-ticker:
-			c.Sync()
+	ticker := time.NewTicker(c.tickerTimeInterval)
+	for range ticker.C {
+		if err := c.Sync(); err != nil {
+			log.Errorf("aliyun sls core updload sync failed with error = %s", err)
 		}
 	}
 }
@@ -162,7 +172,7 @@ func newAliyunSLSLoggerCore(encoder zapcore.Encoder, enab zapcore.LevelEnabler, 
 		logstoreName:       config.LogStoreName,
 		projectName:        config.ProjectName,
 		logGroup:           &sls.LogGroup{},
-		lock:               sync.RWMutex{},
+		lock:               &sync.RWMutex{},
 		tickerTimeInterval: time.Second * time.Duration(config.UploadInterval),
 	}
 	go core.runUpload()

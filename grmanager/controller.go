@@ -24,7 +24,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+)
 
+import (
 	"github.com/glory-go/glory/log"
 )
 
@@ -50,19 +52,16 @@ func init() {
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, shutdownSignals...)
 	go func() {
-		for {
-			select {
-			case sig := <-signals:
-				log.Infof("Got Interrupt signal %+v\n", sig)
-				for _, v := range cancelPool {
-					v()
-				}
-				for _, closer := range closers {
-					go closer.Close()
-				}
-				time.Sleep(time.Second)
-				os.Exit(0)
+		for sig := range signals {
+			log.Infof("Got Interrupt signal %+v\n", sig)
+			for _, v := range cancelPool {
+				v()
 			}
+			for _, closer := range closers {
+				go closer.Close()
+			}
+			time.Sleep(time.Second)
+			os.Exit(0)
 		}
 	}()
 }

@@ -6,12 +6,13 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+)
 
+import (
 	yaml "gopkg.in/yaml.v2"
 )
 
 // value of env keys can be changed from environment
-
 // EnvKeyGloryConfigPath is absolute/relate path to glory.yaml
 const EnvKeyGloryConfigPath = "GLORY_CONFIG_PATH" // default val is "config/glory.yaml"
 

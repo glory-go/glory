@@ -2,14 +2,17 @@ package filter_impl
 
 import (
 	"context"
+)
 
-	"github.com/glory-go/glory/config"
-	"github.com/glory-go/glory/log"
-
-	"github.com/glory-go/glory/plugin"
-
-	"github.com/glory-go/glory/filter"
+import (
 	"google.golang.org/grpc"
+)
+
+import (
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/filter"
+	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/plugin"
 )
 
 // ChainFilter is a filter_impl of GRPC filter

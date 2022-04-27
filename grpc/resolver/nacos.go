@@ -1,10 +1,13 @@
 package resolver
 
 import (
+	"google.golang.org/grpc/resolver"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
-	"google.golang.org/grpc/resolver"
 )
 
 func init() {
@@ -42,7 +45,9 @@ func (r *NacosResolver) watcher() {
 				r.addressList = append(r.addressList, resolver.Address{Addr: v.GetUrl()})
 			}
 		}
-		r.cc.UpdateState(resolver.State{Addresses: r.addressList})
+		if err := r.cc.UpdateState(resolver.State{Addresses: r.addressList}); err != nil {
+			log.Errorf("NacosResolver update state failed with error = %s", err)
+		}
 	}
 }
 func (r *NacosResolver) ResolveNow(clientName resolver.ResolveNowOptions) {

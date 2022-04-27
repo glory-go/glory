@@ -3,7 +3,9 @@ package log
 import (
 	"context"
 	"sync"
+)
 
+import (
 	"go.uber.org/zap"
 )
 

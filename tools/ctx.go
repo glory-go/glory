@@ -1,6 +1,8 @@
 package tools
 
-import "context"
+import (
+	"context"
+)
 
 func GetCtxWithLogID() context.Context {
 	ctx := context.Background()

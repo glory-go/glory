@@ -8,14 +8,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/glory-go/glory/common"
-	"gopkg.in/yaml.v3"
-
-	"github.com/rs/xid"
-	//"github.com/glory-go/glory/log" 不能用这个
 )
 
+import (
+	"github.com/rs/xid"
+
+	"gopkg.in/yaml.v3"
+)
+
+import (
+	"github.com/glory-go/glory/common"
+)
+
+//"github.com/glory-go/glory/log" 不能用这个
 // GetEnv 获取从环境变量读出的值
 func GetEnv(envStr string) string {
 	return os.Getenv(envStr)

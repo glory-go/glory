@@ -2,7 +2,9 @@ package log
 
 import (
 	"context"
+)
 
+import (
 	"github.com/glory-go/glory/config"
 )
 

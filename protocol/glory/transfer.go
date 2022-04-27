@@ -6,20 +6,22 @@ import (
 	"io"
 	"net"
 	"syscall"
+)
 
+import (
 	"github.com/glory-go/glory/log"
 )
 
 const (
 	defaultMaxBufferSize = 16384
-	defualtMaxQueueSize  = 1024
+	//defualtMaxQueueSize  = 1024
 )
 
 type GloryConnClientStatus uint32
 
 const (
 	GloryConnClientHealthy = GloryConnClientStatus(0)
-	GloryConnClientClosed  = GloryConnClientStatus(1)
+	//GloryConnClientClosed  = GloryConnClientStatus(1)
 )
 
 type gloryConnClient struct {

@@ -19,6 +19,9 @@ package glory
 
 import (
 	hessian "github.com/apache/dubbo-go-hessian2"
+)
+
+import (
 	"github.com/glory-go/glory/log"
 )
 

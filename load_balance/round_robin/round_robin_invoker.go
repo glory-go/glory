@@ -22,18 +22,19 @@ import (
 	"reflect"
 	"sync"
 	"time"
+)
 
-	err "github.com/glory-go/glory/error"
-
-	"github.com/glory-go/glory/tools"
+import (
 	"go.uber.org/atomic"
+)
 
+import (
+	"github.com/glory-go/glory/common"
+	err "github.com/glory-go/glory/error"
 	"github.com/glory-go/glory/log"
-
 	"github.com/glory-go/glory/protocol"
 	"github.com/glory-go/glory/registry"
-
-	"github.com/glory-go/glory/common"
+	"github.com/glory-go/glory/tools"
 )
 
 type RoundRobinInvoker struct {
@@ -90,10 +91,12 @@ func (rri *RoundRobinInvoker) StreamInvoke(ctx context.Context, in *common.Param
 
 func (rri *RoundRobinInvoker) StreamRecv(in *common.Params) error {
 	log.Debug("SteramRecv get in.Param = ", in.Addr.GetUrl())
-	for i, _ := range rri.invokerList {
+	for i := range rri.invokerList {
 		if rri.invokerList[i].GetAddr().Equal(in.Addr) {
 			log.Debugf("streamRecv called ", i, "th invoker")
-			rri.invokerList[i].StreamRecv(in)
+			if err := rri.invokerList[i].StreamRecv(in); err != nil {
+				return err
+			}
 			return nil
 		}
 	}

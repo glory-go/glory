@@ -25,13 +25,12 @@ func (rpkg *DefaultRspPackage) SetSuccessPkg(w http.ResponseWriter, result inter
 		retCode = DefaultHttpSuccessCode
 	}
 	w.WriteHeader(int(retCode))
-	var err error
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(result); err != nil {
+	rspPkgBody, err := json.Marshal(result)
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}
-	_, _ = w.Write(rpkgBody)
+	_, _ = w.Write(rspPkgBody)
 }
 
 func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
@@ -39,12 +38,12 @@ func (rpkg *DefaultRspPackage) SetErrorPkg(w http.ResponseWriter, err error, ret
 		retCode = http.StatusInternalServerError
 	}
 	w.WriteHeader(int(retCode))
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(err.Error()); err != nil {
+	rspPackageBody, err := json.Marshal(err.Error())
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}
-	_, _ = w.Write(rpkgBody)
+	_, _ = w.Write(rspPackageBody)
 }
 
 // FomattedRspPackage
@@ -67,13 +66,12 @@ func (rpkg *FomattedRspPackage) SetSuccessPkg(w http.ResponseWriter, result inte
 		retCode = DefaultHttpSuccessCode
 	}
 	w.WriteHeader(int(retCode))
-	var err error
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(*rpkg); err != nil {
+	rspPackageBody, err := json.Marshal(*rpkg)
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}
-	_, _ = w.Write(rpkgBody)
+	_, _ = w.Write(rspPackageBody)
 }
 
 func (rpkg *FomattedRspPackage) SetErrorPkg(w http.ResponseWriter, err error, retCode httpCode) {
@@ -84,8 +82,8 @@ func (rpkg *FomattedRspPackage) SetErrorPkg(w http.ResponseWriter, err error, re
 		retCode = DefaultHttpSuccessCode
 	}
 	w.WriteHeader(int(retCode))
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(*rpkg); err != nil {
+	rpkgBody, err := json.Marshal(*rpkg)
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}
@@ -111,9 +109,8 @@ func (rpkg *ResultAndOKRspPackage) SetSuccessPkg(w http.ResponseWriter, result i
 		retCode = DefaultHttpSuccessCode
 	}
 	w.WriteHeader(int(retCode))
-	var err error
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(*rpkg); err != nil {
+	rpkgBody, err := json.Marshal(*rpkg)
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}
@@ -127,8 +124,8 @@ func (rpkg *ResultAndOKRspPackage) SetErrorPkg(w http.ResponseWriter, err error,
 		retCode = DefaultHttpErrorCode
 	}
 	w.WriteHeader(int(retCode))
-	rpkgBody := make([]byte, 0)
-	if rpkgBody, err = json.Marshal(*rpkg); err != nil {
+	rpkgBody, err := json.Marshal(*rpkg)
+	if err != nil {
 		_, _ = w.Write([]byte(fmt.Sprintf(`{"retcode":%d, "retmsg":"fatel err: marshal rspPackage failed", "result": null}`, -1)))
 		return
 	}

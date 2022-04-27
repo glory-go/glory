@@ -1,10 +1,13 @@
 package resolver
 
 import (
+	"google.golang.org/grpc/resolver"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
-	"google.golang.org/grpc/resolver"
 )
 
 func init() {
@@ -57,7 +60,9 @@ func (r *K8SResolver) watcher() {
 			delete(r.existMap, e.Addr.GetUrl())
 			r.addressList = newList
 		}
-		r.cc.UpdateState(resolver.State{Addresses: r.addressList})
+		if err := r.cc.UpdateState(resolver.State{Addresses: r.addressList}); err != nil {
+			log.Errorf("K8SResolver update state failed with error = %s", err)
+		}
 	}
 }
 func (r *K8SResolver) ResolveNow(clientName resolver.ResolveNowOptions) {

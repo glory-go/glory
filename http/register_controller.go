@@ -5,13 +5,18 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+)
+
+import (
+	"github.com/go-playground/validator/v10"
+
+	"github.com/gorilla/schema"
 
 	"github.com/gorilla/websocket"
+)
 
+import (
 	"github.com/glory-go/glory/log"
-
-	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/schema"
 )
 
 var v *validator.Validate

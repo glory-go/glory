@@ -6,11 +6,16 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+)
 
-	"github.com/glory-go/glory/log"
-
+import (
 	"github.com/gorilla/mux"
+
 	"github.com/gorilla/websocket"
+)
+
+import (
+	"github.com/glory-go/glory/log"
 )
 
 var rspImpPackage RspPackageFactory

@@ -3,16 +3,18 @@ package server
 import (
 	"context"
 	"sync"
+)
 
-	"github.com/glory-go/glory/log"
-
+import (
 	gostNet "github.com/dubbogo/gost/net"
+)
 
+import (
+	"github.com/glory-go/glory/boot"
 	"github.com/glory-go/glory/common"
-	"github.com/glory-go/glory/plugin"
-
 	"github.com/glory-go/glory/config"
-
+	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/plugin"
 	"github.com/glory-go/glory/service"
 )
 
@@ -47,7 +49,10 @@ func (s *DefaultGloryServer) RegisterService(service service.Service) {
 
 // Run run manual service and load and run auto serivce
 func (s *DefaultGloryServer) Run() {
-	// load auto service:
+	// auto inject load
+	boot.Load()
+
+	// load service:
 	for _, v := range s.Services {
 		// 对于注册好的每个service，都要1 服务注册、 2 开启监听
 		// service registry procedure
@@ -69,11 +74,8 @@ func (s *DefaultGloryServer) Run() {
 			} else {
 				registryProtoc.Register(v.GetServiceID(), lstnAddress)
 				go func() {
-					select {
-					case <-s.ctx.Done():
-						registryProtoc.UnRegister(v.GetServiceID(), lstnAddress)
-						return
-					}
+					<-s.ctx.Done()
+					registryProtoc.UnRegister(v.GetServiceID(), lstnAddress)
 				}()
 			}
 
@@ -82,13 +84,14 @@ func (s *DefaultGloryServer) Run() {
 
 		s.wg.Add(1)
 		go func(s service.Service, wg *sync.WaitGroup, ctx context.Context) {
+			ctx, cancel := context.WithCancel(ctx)
 			defer func() {
 				if e := recover(); e != nil {
 					log.Error("error :", e)
 				}
+				cancel()
 				wg.Done()
 			}()
-			ctx, _ = context.WithCancel(ctx)
 			s.Run(ctx)
 		}(v, &s.wg, s.ctx)
 	}

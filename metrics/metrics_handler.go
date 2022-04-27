@@ -2,11 +2,12 @@ package metrics
 
 import (
 	"sync"
+)
 
-	"github.com/glory-go/glory/tools"
-
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/tools"
 )
 
 type MetricsHandler interface {
@@ -46,7 +47,7 @@ func (ph *DefaultMetricsHandler) run() {
 	wg := sync.WaitGroup{}
 	for _, v := range ph.services {
 		wg.Add(1)
-		go func() {
+		go func(v MetricsService) {
 			defer func() {
 				if e := recover(); e != nil {
 					log.Error("error %d")
@@ -55,7 +56,7 @@ func (ph *DefaultMetricsHandler) run() {
 				wg.Done()
 			}()
 			v.run()
-		}()
+		}(v)
 	}
 	log.Debug("prometheus service started")
 	wg.Wait()
@@ -82,7 +83,6 @@ func (ph *DefaultMetricsHandler) counterInsc(metricsName string, jobNames []stri
 	if !haveSet {
 		log.Error("your jobNames = ", jobNames, "can't find target jobNames Service in glory.yaml, please check")
 	}
-	return
 }
 
 func (ph *DefaultMetricsHandler) gaugeSet(gaugeName string, val float64, jobNames []string) {

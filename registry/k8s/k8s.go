@@ -5,24 +5,35 @@ import (
 	"encoding/json"
 	"os"
 	"time"
+)
 
+import (
+	perrors "github.com/pkg/errors"
+
+	v1 "k8s.io/api/core/v1"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/strategicpatch"
+
+	"k8s.io/client-go/informers"
+
+	"k8s.io/client-go/kubernetes"
+
+	"k8s.io/client-go/rest"
+
+	"k8s.io/client-go/tools/cache"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
 	"github.com/glory-go/glory/registry"
 	"github.com/glory-go/glory/tools"
-	perrors "github.com/pkg/errors"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/selection"
-	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/apimachinery/pkg/util/strategicpatch"
-	"k8s.io/client-go/informers"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
 )
 
 const (

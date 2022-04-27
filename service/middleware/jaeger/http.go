@@ -3,12 +3,19 @@ package jaeger
 import (
 	"context"
 	"net/http"
+)
 
+import (
+	"github.com/opentracing-contrib/go-stdlib/nethttp"
+
+	"github.com/opentracing/opentracing-go"
+
+	jaeger "github.com/uber/jaeger-client-go"
+)
+
+import (
 	ghttp "github.com/glory-go/glory/http"
 	"github.com/glory-go/glory/log"
-	"github.com/opentracing-contrib/go-stdlib/nethttp"
-	"github.com/opentracing/opentracing-go"
-	jaeger "github.com/uber/jaeger-client-go"
 )
 
 type AliyunJaegerMW struct{}

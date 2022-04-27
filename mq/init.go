@@ -1,6 +1,8 @@
 package mq
 
-import "github.com/glory-go/glory/config"
+import (
+	"github.com/glory-go/glory/config"
+)
 
 var (
 	inited bool
