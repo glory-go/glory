@@ -5,9 +5,14 @@ import (
 	syslog "log"
 	"os"
 	"time"
+)
 
-	"github.com/glory-go/glory/log"
+import (
 	"gorm.io/gorm/logger"
+)
+
+import (
+	"github.com/glory-go/glory/log"
 )
 
 type GormLogger struct {

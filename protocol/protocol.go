@@ -19,7 +19,9 @@ package protocol
 
 import (
 	"context"
+)
 
+import (
 	"github.com/glory-go/glory/common"
 )
 

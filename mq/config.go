@@ -2,7 +2,9 @@ package mq
 
 import (
 	"fmt"
+)
 
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/tools"
 )

@@ -3,11 +3,16 @@ package mongodb
 import (
 	"context"
 	"fmt"
+)
 
-	"github.com/glory-go/glory/config"
-	"github.com/glory-go/glory/log"
+import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+import (
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
 type MongoDBService struct {

@@ -20,11 +20,12 @@ package invoker_impl
 import (
 	"context"
 	"reflect"
+)
 
+import (
+	"github.com/glory-go/glory/common"
 	err "github.com/glory-go/glory/error"
 	"github.com/glory-go/glory/log"
-
-	"github.com/glory-go/glory/common"
 )
 
 type DefaultInvoker struct {
@@ -74,8 +75,7 @@ func (d *DefaultInvoker) StreamInvoke(ctx context.Context, in *common.Params, rs
 	if !okType {
 		return reflect.Value{}, nil, in.Seq, err.GloryFrameworkErrorServerStreamMethodNotFound
 	}
-	paramList := make([]interface{}, 0)
-	paramList = in.Ins
+	paramList := in.Ins
 
 	// store full duplex channel of two or more
 	valueChanList := []reflect.Value{
@@ -121,8 +121,7 @@ func (d *DefaultInvoker) Invoke(ctx context.Context, in *common.Params) error {
 		log.Error("server not found unary method: ", in.MethodName)
 		return err.GloryFrameworkErrorServerUnaryMethodNotFound
 	}
-	paramList := make([]interface{}, 0)
-	paramList = in.Ins
+	paramList := in.Ins
 
 	valueList := []reflect.Value{
 		reflect.ValueOf(ctx),

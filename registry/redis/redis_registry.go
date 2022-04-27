@@ -20,13 +20,18 @@ package redis
 import (
 	"strings"
 	"time"
+)
 
+import (
+	"github.com/go-redis/redis"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
 	"github.com/glory-go/glory/registry"
-	"github.com/go-redis/redis"
 )
 
 type RedisRegistry struct {

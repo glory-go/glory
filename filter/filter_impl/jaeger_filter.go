@@ -4,19 +4,26 @@ import (
 	"context"
 	"io"
 	"strings"
+)
 
+import (
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+	jaegerlog "github.com/opentracing/opentracing-go/log"
+
+	"github.com/uber/jaeger-client-go"
+	jaegercfg "github.com/uber/jaeger-client-go/config"
+	"github.com/uber/jaeger-client-go/transport"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/filter"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
-	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/ext"
-	jaegerlog "github.com/opentracing/opentracing-go/log"
-	"github.com/uber/jaeger-client-go"
-	jaegercfg "github.com/uber/jaeger-client-go/config"
-	"github.com/uber/jaeger-client-go/transport"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 func init() {

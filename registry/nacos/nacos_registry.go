@@ -2,17 +2,23 @@ package nacos
 
 import (
 	"fmt"
-	"github.com/glory-go/glory/common"
-	"github.com/glory-go/glory/config"
-	"github.com/glory-go/glory/log"
-	"github.com/glory-go/glory/plugin"
-	"github.com/glory-go/glory/registry"
+	"strconv"
+)
+
+import (
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/naming_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/model"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"strconv"
+)
+
+import (
+	"github.com/glory-go/glory/common"
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/plugin"
+	"github.com/glory-go/glory/registry"
 )
 
 const (

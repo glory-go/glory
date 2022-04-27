@@ -6,10 +6,11 @@ import (
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+)
 
-	"github.com/glory-go/glory/log"
-
+import (
 	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
 type jsonRPCService struct {

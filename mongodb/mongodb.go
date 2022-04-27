@@ -2,10 +2,15 @@ package mongodb
 
 import (
 	"errors"
+)
 
+import (
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type MongoDBHandler struct {
@@ -21,7 +26,7 @@ func init() {
 
 func newMongoDBHandler() *MongoDBHandler {
 	return &MongoDBHandler{
-		services: make(map[string]*MongoDBService, 0),
+		services: make(map[string]*MongoDBService),
 	}
 }
 

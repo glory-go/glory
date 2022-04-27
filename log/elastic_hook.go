@@ -5,10 +5,16 @@ import (
 	"fmt"
 	"sync"
 	"time"
+)
 
-	"github.com/glory-go/glory/tools"
+import (
 	"github.com/olivere/elastic/v7"
+
 	"go.uber.org/zap/zapcore"
+)
+
+import (
+	"github.com/glory-go/glory/tools"
 )
 
 var (
@@ -72,7 +78,7 @@ type ElasticDebugHook struct {
 	serviceName string
 }
 
-func (c ElasticDebugHook) Write(p []byte) (n int, err error) {
+func (c *ElasticDebugHook) Write(p []byte) (n int, err error) {
 	defer func() {
 		c.mux.Unlock()
 	}()
@@ -95,7 +101,7 @@ type ElasticInfoHook struct {
 	serviceName string
 }
 
-func (c ElasticInfoHook) Write(p []byte) (n int, err error) {
+func (c *ElasticInfoHook) Write(p []byte) (n int, err error) {
 	defer func() {
 		c.mux.Unlock()
 	}()
@@ -118,7 +124,7 @@ type ElasticWarnHook struct {
 	serviceName string
 }
 
-func (c ElasticWarnHook) Write(p []byte) (n int, err error) {
+func (c *ElasticWarnHook) Write(p []byte) (n int, err error) {
 	defer func() {
 		c.mux.Unlock()
 	}()
@@ -141,7 +147,7 @@ type ElasticErrorHook struct {
 	serviceName string
 }
 
-func (c ElasticErrorHook) Write(p []byte) (n int, err error) {
+func (c *ElasticErrorHook) Write(p []byte) (n int, err error) {
 	defer func() {
 		c.mux.Unlock()
 	}()
@@ -164,7 +170,7 @@ type ElasticPanicHook struct {
 	serviceName string
 }
 
-func (c ElasticPanicHook) Write(p []byte) (n int, err error) {
+func (c *ElasticPanicHook) Write(p []byte) (n int, err error) {
 	defer func() {
 		c.mux.Unlock()
 	}()

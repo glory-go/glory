@@ -1,9 +1,13 @@
 package jaeger
 
 import (
-	"github.com/glory-go/glory/log"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+
 	"google.golang.org/grpc"
+)
+
+import (
+	"github.com/glory-go/glory/log"
 )
 
 func UnaryServerMW() grpc.UnaryServerInterceptor {

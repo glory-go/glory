@@ -3,7 +3,9 @@ package glory
 import (
 	"context"
 	"reflect"
+)
 
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	_ "github.com/glory-go/glory/load_balance/round_robin"
@@ -142,9 +144,6 @@ func NewClient(ctx context.Context, clientName string, clientService interface{}
 			end := len(in)
 			//invokeCtx := context.Background()
 			if end > 0 && in[0].Type().String() == "context.Context" { // 如果存在传入的ctx
-				if !in[0].IsNil() {
-					//invokeCtx = in[0].Interface().(context.Context)
-				}
 				start += 1
 			}
 

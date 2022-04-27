@@ -1,11 +1,15 @@
 package grpc
 
 import (
+	perrors "github.com/pkg/errors"
+
+	"google.golang.org/grpc/resolver"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/plugin"
-	perrors "github.com/pkg/errors"
-	"google.golang.org/grpc/resolver"
 )
 
 func NewResolverBuilder(typ string) resolver.Builder {

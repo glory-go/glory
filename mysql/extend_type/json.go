@@ -4,6 +4,9 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+)
+
+import (
 	"github.com/pkg/errors"
 )
 

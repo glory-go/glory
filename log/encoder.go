@@ -1,6 +1,8 @@
 package log
 
-import "go.uber.org/zap/zapcore"
+import (
+	"go.uber.org/zap/zapcore"
+)
 
 type GloryEncoder struct {
 	zapcore.Encoder

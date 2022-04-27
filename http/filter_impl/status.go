@@ -3,7 +3,9 @@ package filter_impl
 import (
 	"strconv"
 	"time"
+)
 
+import (
 	ghttp "github.com/glory-go/glory/http"
 	"github.com/glory-go/glory/metrics"
 )
@@ -18,7 +20,7 @@ const (
 func BasicHttpStatusMiddleware(c *ghttp.GRegisterController, f ghttp.HandleFunc) (err error) {
 	currTime := time.Now()
 	err = f(c)
-	expireTime := time.Now().Sub(currTime)
+	expireTime := time.Since(currTime)
 	metrics.GaugeSet(HTTPRequestTimeGaugeName+c.Key(), float64(expireTime.Milliseconds()))
 	metrics.CounterInsc(HttpRetCode + c.Key() + "_" + strconv.Itoa(int(c.RspCode)))
 	metrics.CounterInsc(HTTPQueryCountName + c.Key())

@@ -1,6 +1,8 @@
 package metrics
 
-import "github.com/glory-go/glory/config"
+import (
+	"github.com/glory-go/glory/config"
+)
 
 type MetricsService interface {
 	loadconfig(conf *config.MetricsConfig) error

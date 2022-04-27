@@ -2,14 +2,20 @@ package jaeger
 
 import (
 	"io"
+)
 
+import (
+	"github.com/opentracing/opentracing-go"
+
+	jaeger "github.com/uber/jaeger-client-go"
+	"github.com/uber/jaeger-client-go/transport"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/grmanager"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/tools"
-	"github.com/opentracing/opentracing-go"
-	jaeger "github.com/uber/jaeger-client-go"
-	"github.com/uber/jaeger-client-go/transport"
 )
 
 const (

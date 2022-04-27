@@ -18,6 +18,10 @@
 package plugin
 
 import (
+	"google.golang.org/grpc/resolver"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/filter"
@@ -25,7 +29,6 @@ import (
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/protocol"
 	"github.com/glory-go/glory/registry"
-	"google.golang.org/grpc/resolver"
 )
 
 // protocol

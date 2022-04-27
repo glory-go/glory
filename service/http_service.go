@@ -4,12 +4,18 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+)
 
+import (
+	"github.com/gorilla/mux"
+
+	"github.com/urfave/negroni"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	ghttp "github.com/glory-go/glory/http"
 	"github.com/glory-go/glory/service/middleware/jaeger"
-	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
 )
 
 type HttpService struct {

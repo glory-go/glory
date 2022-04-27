@@ -17,7 +17,9 @@
 
 package registry
 
-import "github.com/glory-go/glory/common"
+import (
+	"github.com/glory-go/glory/common"
+)
 
 type Registry interface {
 	Register(key string, address common.Address)

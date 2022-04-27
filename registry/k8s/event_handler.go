@@ -1,10 +1,13 @@
 package k8s
 
 import (
+	v1 "k8s.io/api/core/v1"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/tools"
-	v1 "k8s.io/api/core/v1"
 )
 
 type eventHandler struct {

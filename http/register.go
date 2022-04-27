@@ -6,11 +6,16 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+)
 
-	"github.com/glory-go/glory/log"
-
+import (
 	"github.com/gorilla/mux"
+
 	"github.com/gorilla/websocket"
+)
+
+import (
+	"github.com/glory-go/glory/log"
 )
 
 var rspImpPackage RspPackageFactory
@@ -112,7 +117,8 @@ func getGloryWSHandler(handler func(*GRegisterWSController)) func(w http.Respons
 			}
 		}()
 		// 升级接口到websocket
-		conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+		upgrader := websocket.Upgrader{}
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
 		}

@@ -1,16 +1,19 @@
 package grpc
 
 import (
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+
+	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/balancer/roundrobin"
+)
+
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	_ "github.com/glory-go/glory/filter/filter_impl"
-	"github.com/glory-go/glory/filter/intercepter_impl"
 	_ "github.com/glory-go/glory/grpc/resolver"
 	"github.com/glory-go/glory/log"
 	"github.com/glory-go/glory/service/middleware/jaeger"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"google.golang.org/grpc"
-	_ "google.golang.org/grpc/balancer/roundrobin"
 )
 
 type GrpcClient struct {
@@ -67,13 +70,13 @@ func (gc *GrpcClient) GetConn() *grpc.ClientConn {
 }
 
 // addDialOptionsWithFilters 根据filter返回对应的DialOption
-func addDialOptionsWithFilters(opts []grpc.DialOption, filterKeys []string) []grpc.DialOption {
-	intercepter, err := intercepter_impl.NewDefaultGRPCIntercepter(filterKeys)
-	if err != nil {
-		panic(err)
-	}
-	return append(opts, grpc.WithUnaryInterceptor(intercepter.ClientIntercepterHandle))
-}
+//func addDialOptionsWithFilters(opts []grpc.DialOption, filterKeys []string) []grpc.DialOption {
+//	intercepter, err := intercepter_impl.NewDefaultGRPCIntercepter(filterKeys)
+//	if err != nil {
+//		panic(err)
+//	}
+//	return append(opts, grpc.WithUnaryInterceptor(intercepter.ClientIntercepterHandle))
+//}
 
 //addDialOptionsWithLoadBalancer 根据opt返回对应的DialOption
 func addDialOptionsWithLoadBalancer(opts []grpc.DialOption) []grpc.DialOption {

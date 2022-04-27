@@ -2,7 +2,9 @@ package config
 
 import (
 	"fmt"
+)
 
+import (
 	"github.com/glory-go/glory/tools"
 )
 

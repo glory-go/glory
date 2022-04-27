@@ -2,10 +2,15 @@ package redis
 
 import (
 	"errors"
+)
 
+import (
+	"github.com/go-redis/redis/v8"
+)
+
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
-	"github.com/go-redis/redis/v8"
 )
 
 func init() {

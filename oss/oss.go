@@ -2,7 +2,9 @@ package oss
 
 import (
 	"errors"
+)
 
+import (
 	"github.com/glory-go/glory/config"
 )
 

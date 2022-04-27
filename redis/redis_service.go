@@ -2,12 +2,17 @@ package redis
 
 import (
 	"sync"
+)
 
-	"github.com/glory-go/glory/log"
+import (
 	"github.com/go-redis/redis/v8"
 
-	"github.com/glory-go/glory/config"
 	_ "github.com/go-sql-driver/mysql"
+)
+
+import (
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
 )
 
 // RedisService 保存多个redis的库

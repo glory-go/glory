@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+)
 
+import (
 	"github.com/glory-go/glory/common"
 	"github.com/glory-go/glory/config"
 	_ "github.com/glory-go/glory/filter/filter_impl"
@@ -32,7 +34,7 @@ type serviceConf struct {
 type serviceBase struct {
 	name string
 	conf serviceConf
-	ctx  context.Context
+	//ctx  context.Context
 }
 
 func (sb *serviceBase) GetName() string {

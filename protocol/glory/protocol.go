@@ -21,14 +21,13 @@ import (
 	"context"
 	"net"
 	"reflect"
+)
 
-	"github.com/glory-go/glory/config"
-
-	"github.com/glory-go/glory/plugin"
-
-	"github.com/glory-go/glory/log"
-
+import (
 	"github.com/glory-go/glory/common"
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/log"
+	"github.com/glory-go/glory/plugin"
 	"github.com/glory-go/glory/protocol"
 )
 
@@ -75,11 +74,6 @@ func (g *GloryProtocol) Export(ctx context.Context, invoker common.Invoker, addr
 		chanByteStr := make(chan string)
 		grStopChain := make(chan interface{}, 1)
 		connCloseStopChain := make(chan interface{}, 1)
-		defer func() {
-			close(chanByteStr)
-			close(grStopChain)
-			close(connCloseStopChain)
-		}()
 		gloryClient := newGloryConnClientFromConn(conn)
 		// chanValue -> chan interface{}
 		go func() {
@@ -149,7 +143,7 @@ func (g *GloryProtocol) Export(ctx context.Context, invoker common.Invoker, addr
 
 func (g *GloryProtocol) sendErrorResponse(req *RequestPackage, client *gloryConnClient, err *Error) {
 	rspPkg := NewResponsePackage(req.Header.TraceID, uint64(common.ErrorRspPkg), req.Header.Seq, err)
-	rspPkg.sendToConn(client, g.gloryPkgHandler)
+	_ = rspPkg.sendToConn(client, g.gloryPkgHandler)
 }
 
 func (g *GloryProtocol) handleStreamSendPkg(pkg *RequestPackage) {
@@ -169,7 +163,7 @@ func (g *GloryProtocol) handleStreamRequest(ctx context.Context, client *gloryCo
 		log.Error("handleStreamRequest:rspPkg.sendToConn(conn, g.gloryPkgHandler) err =", err)
 		return
 	}
-	closeChan := make(chan interface{}, 0)
+	closeChan := make(chan interface{})
 	valueChan := make(chan reflect.Value)
 	go func() {
 		for {
@@ -253,7 +247,7 @@ func callStreamSendPkg(invoker common.Invoker, pkg *RequestPackage) {
 		Value:      pkg.Params[0],
 		Seq:        pkg.Header.Seq,
 	}
-	invoker.StreamRecv(params)
+	_ = invoker.StreamRecv(params)
 }
 
 func (g *GloryProtocol) Refer(addr common.Address) common.Invoker {

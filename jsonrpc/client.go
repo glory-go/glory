@@ -3,7 +3,9 @@ package jsonrpc
 import (
 	"net/rpc"
 	"net/rpc/jsonrpc"
+)
 
+import (
 	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 )
@@ -13,7 +15,7 @@ type jsonRPCClient struct {
 	targetAddress string
 }
 
-func (jrpc *jsonRPCClient) loadConfig(conf *config.JsonRPCClientConfig) {
+func (jrpc *jsonRPCClient) loadConfig(conf *config.ClientConfig) {
 	//if conf.ConfigSource == "env" {
 	//	if err := tools.ReadAllConfFromEnv(conf); err != nil {
 	//		log.Error("grpc-client: get conf struct err = ", err)

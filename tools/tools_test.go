@@ -1,6 +1,8 @@
 package tools
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetEnv(t *testing.T) {
 	type args struct {
@@ -35,7 +37,7 @@ func TestReadFromEnvIfNeed(t *testing.T) {
 	}
 
 	type args struct {
-		rawConfig interface{}
+		rawConfig MetricsConfig
 	}
 	tests := []struct {
 		name    string

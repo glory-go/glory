@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"log"
 	"net"
+)
 
-	"github.com/glory-go/glory/filter/intercepter_impl"
-	"github.com/glory-go/glory/service/middleware/jaeger"
-
-	"github.com/glory-go/glory/config"
-
+import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+
 	"google.golang.org/grpc"
+)
+
+import (
+	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/service/middleware/jaeger"
 )
 
 type GrpcService struct {
@@ -60,12 +63,12 @@ func (gs *GrpcService) GetGrpcServer() *grpc.Server {
 	return gs.grpcServer
 }
 
-func getOptionFromFilter(filterKeys []string) []grpc.ServerOption {
-	intercepter, err := intercepter_impl.NewDefaultGRPCIntercepter(filterKeys)
-	if err != nil {
-		panic(err)
-	}
-	return []grpc.ServerOption{
-		grpc.UnaryInterceptor(intercepter.ServerIntercepterHandle),
-	}
-}
+//func getOptionFromFilter(filterKeys []string) []grpc.ServerOption {
+//	intercepter, err := intercepter_impl.NewDefaultGRPCIntercepter(filterKeys)
+//	if err != nil {
+//		panic(err)
+//	}
+//	return []grpc.ServerOption{
+//		grpc.UnaryInterceptor(intercepter.ServerIntercepterHandle),
+//	}
+//}

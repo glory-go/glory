@@ -12,6 +12,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gogo/protobuf v1.3.2
+	github.com/google/martian v2.1.0+incompatible
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -19,7 +20,6 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/golang-lru v0.5.3 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
-	github.com/json-iterator/go v1.1.11
 	github.com/klauspost/compress v1.11.8 // indirect
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/natefinch/lumberjack v2.0.0+incompatible
@@ -32,7 +32,6 @@ require (
 	github.com/rs/xid v1.2.1
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
 	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0

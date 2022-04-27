@@ -7,11 +7,15 @@ import (
 	"io"
 	"io/ioutil"
 	"time"
+)
 
-	"github.com/glory-go/glory/config"
-
+import (
 	"github.com/qiniu/api.v7/v7/auth/qbox"
 	"github.com/qiniu/api.v7/v7/storage"
+)
+
+import (
+	"github.com/glory-go/glory/config"
 )
 
 type OssService interface {
@@ -25,7 +29,6 @@ type OssService interface {
 
 type qiniuOssService struct {
 	config           qiniuOssConfig
-	upToken          string
 	mac              *qbox.Mac
 	defaultUploader  *storage.FormUploader
 	defaultPutPolicy *storage.PutPolicy
