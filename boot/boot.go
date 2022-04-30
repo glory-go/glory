@@ -1,6 +1,7 @@
 package boot
 
 import (
+	"log"
 	"reflect"
 	"strings"
 )
@@ -17,6 +18,7 @@ type RegisterServicePair struct {
 
 var registeredMap = make(map[string]RegisterServicePair)
 var implCompletedMap = make(map[string]interface{})
+var grpcImplCompletedMap = make(map[string]interface{})
 var controllerMap = make(map[string]interface{})
 
 func RegisterController(controller interface{}) {
@@ -45,40 +47,10 @@ func Load() {
 
 	// impl controller
 	for _, v := range controllerMap {
-		implController(v)
+		impl(RegisterServicePair{
+			svcStructPtr: v,
+		})
 	}
-}
-
-func implController(c interface{}) interface{} {
-	valueOf := reflect.ValueOf(c)
-	valueOfElem := valueOf.Elem()
-	typeOf := valueOfElem.Type()
-	if typeOf.Kind() != reflect.Struct {
-		panic("invalid struct ptr")
-	}
-
-	numField := valueOfElem.NumField()
-	for i := 0; i < numField; i++ {
-		t := typeOf.Field(i)
-		svcImplStructName := t.Tag.Get("service")
-		if svcImplStructName == "" {
-			// not autowire field
-			continue
-		}
-
-		// get impled sub service
-		impledPtr := impl(registeredMap[getInterfaceIdByNames(t.Type.Name(), svcImplStructName)])
-
-		// set field
-		subService := valueOfElem.Field(i)
-		if !(subService.Kind() == reflect.Interface && subService.IsValid() && subService.CanSet()) {
-			err := perrors.Errorf("Failed to autowire controller %s 's. It's field %s with tag 'service:\"%s\"', please check if the field is exported",
-				getName(c), t.Type.Name(), svcImplStructName)
-			panic(err)
-		}
-		subService.Set(reflect.ValueOf(impledPtr))
-	}
-	return c
 }
 
 func impl(p RegisterServicePair) interface{} {
@@ -88,6 +60,9 @@ func impl(p RegisterServicePair) interface{} {
 		return impledPtr
 	}
 	defer func() { // assure the impl procedure of one service run once
+		if r := recover(); r != nil {
+			log.Printf("recover panic = %s", r)
+		}
 		implCompletedMap[tempInterfaceId] = p.svcStructPtr
 	}()
 
@@ -101,20 +76,28 @@ func impl(p RegisterServicePair) interface{} {
 	numField := valueOfElem.NumField()
 	for i := 0; i < numField; i++ {
 		t := typeOf.Field(i)
-		svcImplStructName := t.Tag.Get("service")
-		if svcImplStructName == "" {
-			// not autowire field
+		var impledPtr interface{}
+		tagKey := ""
+		tagValue := ""
+		if svcImplStructName := t.Tag.Get("service"); svcImplStructName != "" {
+			// get impled sub local service
+			impledPtr = impl(registeredMap[getInterfaceIdByNames(t.Type.Name(), svcImplStructName)])
+			tagKey = "service"
+			tagValue = svcImplStructName
+		} else if grpcClientName := t.Tag.Get("grpc"); grpcClientName != "" {
+			// `service:"grpc"` means auto wire grpc client
+			impledPtr = implGRPC(t.Type.Name(), grpcClientName, t.Tag.Get("interceptorsKey"))
+			tagKey = "grpc"
+			tagValue = grpcClientName
+		}
+		if tagKey == "" && tagValue == "" {
 			continue
 		}
-
-		// get impled sub service
-		impledPtr := impl(registeredMap[getInterfaceIdByNames(t.Type.Name(), svcImplStructName)])
-
 		// set field
 		subService := valueOfElem.Field(i)
 		if !(subService.Kind() == reflect.Interface && subService.IsValid() && subService.CanSet()) {
-			err := perrors.Errorf("Failed to autowire interface %s 's impl %s service. It's field %s with tag 'service:\"%s\"', please check if the field is exported",
-				getName(p.interfaceStruct), getName(p.svcStructPtr), t.Type.Name(), svcImplStructName)
+			err := perrors.Errorf("Failed to autowire interface %s's impl %s service. It's field %s with tag '%s:\"%s\"', please check if the field is exported",
+				getName(p.interfaceStruct), getName(p.svcStructPtr), t.Type.Name(), tagKey, tagValue)
 			panic(err)
 		}
 		subService.Set(reflect.ValueOf(impledPtr))
@@ -136,6 +119,9 @@ func getInterfaceIdByNames(interfaceName, structPtrName string) string {
 }
 
 func getName(v interface{}) string {
+	if v == nil {
+		return ""
+	}
 	typeOfInterface := getTypeFromInterface(v)
 	return typeOfInterface.Name()
 }
