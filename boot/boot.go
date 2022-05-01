@@ -1,13 +1,16 @@
 package boot
 
 import (
-	"log"
 	"reflect"
 	"strings"
 )
 
 import (
 	perrors "github.com/pkg/errors"
+)
+
+import (
+	"github.com/glory-go/glory/log"
 )
 
 type RegisterServicePair struct {
@@ -36,7 +39,8 @@ func RegisterService(interfaceStruct, structPtr interface{}, constructFunction .
 	registeredMap[serviceId] = newPair
 }
 
-func Load() {
+func Load(config map[interface{}]interface{}) {
+	userConfig = config
 	// set impl
 	for serviceId, v := range registeredMap {
 		if _, ok := implCompletedMap[serviceId]; ok {
@@ -61,7 +65,7 @@ func impl(p RegisterServicePair) interface{} {
 	}
 	defer func() { // assure the impl procedure of one service run once
 		if r := recover(); r != nil {
-			log.Printf("recover panic = %s", r)
+			log.Errorf("recover panic = %s", r)
 		}
 		implCompletedMap[tempInterfaceId] = p.svcStructPtr
 	}()
@@ -89,6 +93,23 @@ func impl(p RegisterServicePair) interface{} {
 			impledPtr = implGRPC(t.Type.Name(), grpcClientName, t.Tag.Get("interceptorsKey"))
 			tagKey = "grpc"
 			tagValue = grpcClientName
+		} else if configName := t.Tag.Get("config"); configName != "" {
+			// XXX string `config:"mysvc.config"` means auto wire config
+			configStr, err := implConfig(configName)
+			if err != nil {
+				panic(err)
+			}
+			tagKey = "config"
+			tagValue = configName
+
+			subService := valueOfElem.Field(i)
+			if !(subService.Kind() == reflect.String && subService.IsValid() && subService.CanSet()) {
+				err := perrors.Errorf("Failed to autowire interface %s's confige. It's field %s with tag '%s:\"%s\"', please check if the field is exported",
+					getName(p.interfaceStruct), t.Type.Name(), tagKey, tagValue)
+				panic(err)
+			}
+			subService.Set(reflect.ValueOf(configStr))
+			continue
 		}
 		if tagKey == "" && tagValue == "" {
 			continue

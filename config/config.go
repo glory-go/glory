@@ -33,9 +33,13 @@ type config interface {
 	checkAndFix()
 }
 
+func GetGloryEnv() string {
+	return os.Getenv(EnvKeyGloryEnv)
+}
+
 func GetConfigPath() string {
 	configPath := ""
-	env := os.Getenv(EnvKeyGloryEnv)
+	env := GetGloryEnv()
 
 	configFilePath := DefaultConfigPath
 	if os.Getenv(EnvKeyGloryConfigPath) != "" {
