@@ -1,11 +1,14 @@
 package boot
 
 import (
+	"os"
 	"reflect"
 	"strings"
 )
 
 import (
+	"github.com/glory-go/monkey"
+
 	perrors "github.com/pkg/errors"
 )
 
@@ -17,6 +20,8 @@ type RegisterServicePair struct {
 	interfaceStruct    interface{}
 	svcStructPtr       interface{}
 	constructFunctions []func(interface{})
+	guardMap           map[string]*monkey.PatchGuard
+	isController       bool
 }
 
 var registeredMap = make(map[string]RegisterServicePair)
@@ -33,6 +38,8 @@ func RegisterService(interfaceStruct, structPtr interface{}, constructFunction .
 		interfaceStruct:    interfaceStruct,
 		svcStructPtr:       structPtr,
 		constructFunctions: constructFunction,
+		guardMap:           make(map[string]*monkey.PatchGuard),
+		isController:       false,
 	}
 
 	serviceId := getInterfaceId(newPair)
@@ -53,6 +60,7 @@ func Load(config map[interface{}]interface{}) {
 	for _, v := range controllerMap {
 		impl(RegisterServicePair{
 			svcStructPtr: v,
+			isController: true,
 		})
 	}
 }
@@ -85,7 +93,11 @@ func impl(p RegisterServicePair) interface{} {
 		tagValue := ""
 		if svcImplStructName := t.Tag.Get("service"); svcImplStructName != "" {
 			// get impled sub local service
-			impledPtr = impl(registeredMap[getInterfaceIdByNames(t.Type.Name(), svcImplStructName)])
+			fieldTypeName := t.Type.Name()
+			if fieldTypeName == "" { // autowire struct ptr
+				fieldTypeName = svcImplStructName
+			}
+			impledPtr = impl(registeredMap[getInterfaceIdByNames(fieldTypeName, svcImplStructName)])
 			tagKey = "service"
 			tagValue = svcImplStructName
 		} else if grpcClientName := t.Tag.Get("grpc"); grpcClientName != "" {
@@ -116,7 +128,7 @@ func impl(p RegisterServicePair) interface{} {
 		}
 		// set field
 		subService := valueOfElem.Field(i)
-		if !(subService.Kind() == reflect.Interface && subService.IsValid() && subService.CanSet()) {
+		if !(subService.IsValid() && subService.CanSet()) {
 			err := perrors.Errorf("Failed to autowire interface %s's impl %s service. It's field %s with tag '%s:\"%s\"', please check if the field is exported",
 				getName(p.interfaceStruct), getName(p.svcStructPtr), t.Type.Name(), tagKey, tagValue)
 			panic(err)
@@ -125,6 +137,11 @@ func impl(p RegisterServicePair) interface{} {
 	}
 	for _, f := range p.constructFunctions {
 		f(p.svcStructPtr)
+	}
+	// todo control if using monkey
+	if !p.isController && os.Getenv("GOARCH") == "amd64" {
+		// only service, only amd64 mod can inject monkey function
+		implMonkey(p.svcStructPtr, tempInterfaceId)
 	}
 	return p.svcStructPtr
 }

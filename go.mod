@@ -7,6 +7,7 @@ require (
 	github.com/aliyun/aliyun-log-go-sdk v0.1.19
 	github.com/apache/dubbo-go-hessian2 v1.9.1
 	github.com/dubbogo/gost v1.11.3
+	github.com/glory-go/monkey v1.0.3-0.20220504040844-8c1fa6535179
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.4
