@@ -6,6 +6,7 @@ require (
 	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
 	github.com/aliyun/aliyun-log-go-sdk v0.1.19
 	github.com/apache/dubbo-go-hessian2 v1.9.1
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dubbogo/gost v1.11.3
 	github.com/glory-go/monkey v1.0.3-0.20220504040844-8c1fa6535179
 	github.com/go-playground/validator/v10 v10.4.1
@@ -31,8 +32,10 @@ require (
 	github.com/prometheus/client_golang v1.9.0
 	github.com/qiniu/api.v7/v7 v7.8.0
 	github.com/rs/xid v1.2.1
+	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
 	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	github.com/urfave/negroni v1.0.0
@@ -42,6 +45,7 @@ require (
 	go.uber.org/zap v1.19.0
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
 	google.golang.org/grpc v1.38.0
+	google.golang.org/protobuf v1.26.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gorm.io/driver/mysql v1.0.3

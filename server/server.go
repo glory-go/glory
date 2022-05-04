@@ -50,7 +50,7 @@ func (s *DefaultGloryServer) RegisterService(service service.Service) {
 // Run run manual service and load and run auto serivce
 func (s *DefaultGloryServer) Run() {
 	// auto inject load
-	boot.Load(s.ServerConfig.UserConfig)
+	boot.Load(s.ServerConfig)
 
 	// load service:
 	for _, v := range s.Services {

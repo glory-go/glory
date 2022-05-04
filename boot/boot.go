@@ -3,7 +3,6 @@ package boot
 import (
 	"os"
 	"reflect"
-	"strings"
 )
 
 import (
@@ -13,41 +12,38 @@ import (
 )
 
 import (
+	"github.com/glory-go/glory/boot/common"
+	"github.com/glory-go/glory/boot/interceptor"
+	"github.com/glory-go/glory/boot/util"
+	"github.com/glory-go/glory/config"
 	"github.com/glory-go/glory/log"
 )
 
-type RegisterServicePair struct {
-	interfaceStruct    interface{}
-	svcStructPtr       interface{}
-	constructFunctions []func(interface{})
-	guardMap           map[string]*monkey.PatchGuard
-	isController       bool
-}
-
-var registeredMap = make(map[string]RegisterServicePair)
+var registeredMap = make(map[string]common.RegisterServiceMetadata)
 var implCompletedMap = make(map[string]interface{})
 var grpcImplCompletedMap = make(map[string]interface{})
 var controllerMap = make(map[string]interface{})
 
 func RegisterController(controller interface{}) {
-	controllerMap[getName(controller)] = controller
+	controllerMap[util.GetName(controller)] = controller
 }
 
 func RegisterService(interfaceStruct, structPtr interface{}, constructFunction ...func(interface{})) {
-	newPair := RegisterServicePair{
-		interfaceStruct:    interfaceStruct,
-		svcStructPtr:       structPtr,
-		constructFunctions: constructFunction,
-		guardMap:           make(map[string]*monkey.PatchGuard),
-		isController:       false,
+	newPair := common.RegisterServiceMetadata{
+		InterfaceStruct:    interfaceStruct,
+		SvcStructPtr:       structPtr,
+		ConstructFunctions: constructFunction,
+		GuardMap:           make(map[string]*monkey.PatchGuard),
+		IsController:       false,
 	}
 
 	serviceId := getInterfaceId(newPair)
 	registeredMap[serviceId] = newPair
 }
 
-func Load(config map[interface{}]interface{}) {
-	userConfig = config
+func Load(config *config.ServerConfig) {
+	userConfig = config.UserConfig
+	debugConfig = config.DebugConfig
 	// set impl
 	for serviceId, v := range registeredMap {
 		if _, ok := implCompletedMap[serviceId]; ok {
@@ -58,14 +54,27 @@ func Load(config map[interface{}]interface{}) {
 
 	// impl controller
 	for _, v := range controllerMap {
-		impl(RegisterServicePair{
-			svcStructPtr: v,
-			isController: true,
+		impl(common.RegisterServiceMetadata{
+			SvcStructPtr: v,
+			IsController: true,
 		})
+	}
+
+	// start debug port if enabled
+	if enable := debugConfig["enable"]; enable != "false" {
+		debugPort := debugConfig["port"]
+		if debugPort == "" {
+			debugPort = "1999"
+		}
+		go func() {
+			if err := interceptor.Run(debugPort, registeredMap); err != nil {
+				panic(err)
+			}
+		}()
 	}
 }
 
-func impl(p RegisterServicePair) interface{} {
+func impl(p common.RegisterServiceMetadata) interface{} {
 	tempInterfaceId := getInterfaceId(p)
 	if impledPtr, ok := implCompletedMap[tempInterfaceId]; ok {
 		// if already impleted, return
@@ -75,10 +84,10 @@ func impl(p RegisterServicePair) interface{} {
 		if r := recover(); r != nil {
 			log.Errorf("recover panic = %s", r)
 		}
-		implCompletedMap[tempInterfaceId] = p.svcStructPtr
+		implCompletedMap[tempInterfaceId] = p.SvcStructPtr
 	}()
 
-	valueOf := reflect.ValueOf(p.svcStructPtr)
+	valueOf := reflect.ValueOf(p.SvcStructPtr)
 	valueOfElem := valueOf.Elem()
 	typeOf := valueOfElem.Type()
 	if typeOf.Kind() != reflect.Struct {
@@ -97,7 +106,7 @@ func impl(p RegisterServicePair) interface{} {
 			if fieldTypeName == "" { // autowire struct ptr
 				fieldTypeName = svcImplStructName
 			}
-			impledPtr = impl(registeredMap[getInterfaceIdByNames(fieldTypeName, svcImplStructName)])
+			impledPtr = impl(registeredMap[util.GetInterfaceIdByNames(fieldTypeName, svcImplStructName)])
 			tagKey = "service"
 			tagValue = svcImplStructName
 		} else if grpcClientName := t.Tag.Get("grpc"); grpcClientName != "" {
@@ -117,7 +126,7 @@ func impl(p RegisterServicePair) interface{} {
 			subService := valueOfElem.Field(i)
 			if !(subService.Kind() == reflect.String && subService.IsValid() && subService.CanSet()) {
 				err := perrors.Errorf("Failed to autowire interface %s's confige. It's field %s with tag '%s:\"%s\"', please check if the field is exported",
-					getName(p.interfaceStruct), t.Type.Name(), tagKey, tagValue)
+					util.GetName(p.InterfaceStruct), t.Type.Name(), tagKey, tagValue)
 				panic(err)
 			}
 			subService.Set(reflect.ValueOf(configStr))
@@ -130,42 +139,24 @@ func impl(p RegisterServicePair) interface{} {
 		subService := valueOfElem.Field(i)
 		if !(subService.IsValid() && subService.CanSet()) {
 			err := perrors.Errorf("Failed to autowire interface %s's impl %s service. It's field %s with tag '%s:\"%s\"', please check if the field is exported",
-				getName(p.interfaceStruct), getName(p.svcStructPtr), t.Type.Name(), tagKey, tagValue)
+				util.GetName(p.InterfaceStruct), util.GetName(p.SvcStructPtr), t.Type.Name(), tagKey, tagValue)
 			panic(err)
 		}
 		subService.Set(reflect.ValueOf(impledPtr))
 	}
-	for _, f := range p.constructFunctions {
-		f(p.svcStructPtr)
+	for _, f := range p.ConstructFunctions {
+		f(p.SvcStructPtr)
 	}
 	// todo control if using monkey
-	if !p.isController && os.Getenv("GOARCH") == "amd64" {
+	if !p.IsController && os.Getenv("GOARCH") == "amd64" {
 		// only service, only amd64 mod can inject monkey function
-		implMonkey(p.svcStructPtr, tempInterfaceId)
+		implMonkey(p.SvcStructPtr, tempInterfaceId)
 	}
-	return p.svcStructPtr
+	return p.SvcStructPtr
 }
 
-func getInterfaceId(p RegisterServicePair) string {
-	interfaceName := getName(p.interfaceStruct)
-	structPtrName := getName(p.svcStructPtr)
-	return getInterfaceIdByNames(interfaceName, structPtrName)
-}
-
-func getInterfaceIdByNames(interfaceName, structPtrName string) string {
-	return strings.Join([]string{interfaceName, structPtrName}, "-")
-}
-
-func getName(v interface{}) string {
-	if v == nil {
-		return ""
-	}
-	typeOfInterface := getTypeFromInterface(v)
-	return typeOfInterface.Name()
-}
-
-func getTypeFromInterface(v interface{}) reflect.Type {
-	valueOfInterface := reflect.ValueOf(v)
-	valueOfElemInterface := valueOfInterface.Elem()
-	return valueOfElemInterface.Type()
+func getInterfaceId(p common.RegisterServiceMetadata) string {
+	interfaceName := util.GetName(p.InterfaceStruct)
+	structPtrName := util.GetName(p.SvcStructPtr)
+	return util.GetInterfaceIdByNames(interfaceName, structPtrName)
 }

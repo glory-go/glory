@@ -33,8 +33,10 @@ type ServerConfig struct {
 	MongoDBConfig map[string]*MongoDBConfig `yaml:"mongodb"`
 	// rpc Filter 配置
 	FilterConfigMap map[string]*FilterConfig `yaml:"filter"`
-	// rpc Filter 配置
+	// UserConfig 用户配置
 	UserConfig map[interface{}]interface{} `yaml:"config"`
+	// DebugConfig 接口调试配置
+	DebugConfig map[string]string `yaml:"debug"`
 
 	OrgName    string `yaml:"org_name"` // 可选 classroom|ide|children|goonline: goonline为公共服务，比如前端数据上报
 	ServerName string `yaml:"server_name"`
