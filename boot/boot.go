@@ -3,6 +3,7 @@ package boot
 import (
 	"os"
 	"reflect"
+	"runtime"
 )
 
 import (
@@ -148,7 +149,7 @@ func impl(p common.RegisterServiceMetadata) interface{} {
 		f(p.SvcStructPtr)
 	}
 	// todo control if using monkey
-	if !p.IsController && os.Getenv("GOARCH") == "amd64" {
+	if !p.IsController && (os.Getenv("GOARCH") == "amd64" || runtime.GOARCH == "amd64") {
 		// only service, only amd64 mod can inject monkey function
 		implMonkey(p.SvcStructPtr, tempInterfaceId)
 	}

@@ -21,7 +21,7 @@ var watch = &cobra.Command{
 			InterfaceName:      args[0],
 			ImplementationName: args[1],
 			Method:             args[2],
-			IsParam:            true,
+			IsParam:            args[3] == "true",
 		})
 		if err != nil {
 			panic(err)
