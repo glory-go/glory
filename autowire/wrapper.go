@@ -16,48 +16,76 @@ import (
 
 type WrapperAutowire interface {
 	Autowire
-	Impl(sdID string, param interface{}) (interface{}, error)
+
+	ImplWithoutParam(sdID string) (interface{}, error)
+
+	ImplWithParam(sdID string, param interface{}) (interface{}, error)
+	implWithField(info *FieldInfo) (interface{}, error)
 }
 
 func getWrappedAutowire(autowire Autowire, allAutowires map[string]WrapperAutowire) WrapperAutowire {
 	return &WrapperAutowireImpl{
-		Autowire:     autowire,
-		allAutowires: allAutowires,
-		initedMap:    map[string]bool{},
+		Autowire:           autowire,
+		allAutowires:       allAutowires,
+		singletonImpledMap: map[string]interface{}{},
 	}
 }
 
 type WrapperAutowireImpl struct {
 	Autowire
-	initedMap    map[string]bool
-	latestPtr    interface{}
-	allAutowires map[string]WrapperAutowire
+	singletonImpledMap map[string]interface{}
+	allAutowires       map[string]WrapperAutowire
 }
 
-// Impl is used to get impled struct
-func (w *WrapperAutowireImpl) Impl(sdID string, param interface{}) (interface{}, error) {
+// ImplWithParam is used to get impled struct with param
+func (w *WrapperAutowireImpl) ImplWithParam(sdID string, param interface{}) (interface{}, error) {
 	// 1. check singleton
-	if inited, ok := w.initedMap[sdID]; w.Autowire.IsSingleton() && inited && ok {
-		return w.latestPtr, nil
+	if singletonImpledPtr, ok := w.singletonImpledMap[sdID]; w.Autowire.IsSingleton() && ok {
+		return singletonImpledPtr, nil
 	}
 
 	// 2. factory
 	impledPtr := w.Autowire.Factory(sdID)
 
-	// 3. in ject
+	// 3. inject
 	if err := w.inject(impledPtr, sdID); err != nil {
 		return nil, err
 	}
 
 	// 4. construct field
-	if err := w.Autowire.Construct(sdID, impledPtr, param); err != nil {
+	var err error
+	impledPtr, err = w.Autowire.Construct(sdID, impledPtr, param)
+	if err != nil {
 		return nil, err
 	}
 
-	// 5. record
-	w.initedMap[sdID] = true
-	w.latestPtr = impledPtr
+	// 5. record singleton ptr
+	if w.Autowire.IsSingleton() {
+		w.singletonImpledMap[sdID] = impledPtr
+	}
 	return impledPtr, nil
+}
+
+// ImplWithoutParam is used to create param from field without param
+func (w *WrapperAutowireImpl) ImplWithoutParam(sdID string) (interface{}, error) {
+	param, err := w.ParseParam(sdID, nil)
+	if err != nil {
+		return nil, err
+	}
+	return w.ImplWithParam(sdID, param)
+}
+
+// ImplWithField is used to create param from field and call ImplWithParam
+func (w *WrapperAutowireImpl) implWithField(fi *FieldInfo) (interface{}, error) {
+	sdID, err := w.ParseSDID(fi)
+	if err != nil {
+		return nil, err
+	}
+	param, err := w.ParseParam(sdID, fi)
+	if err != nil {
+		return nil, err
+	}
+	return w.ImplWithParam(sdID, param)
 }
 
 // inject do tag autowire and monkey inject
@@ -74,7 +102,7 @@ func (w *WrapperAutowireImpl) inject(impledPtr interface{}, sdId string) error {
 	}
 
 	// deal with struct
-	// 3. tag inject
+	// 2. tag inject
 	numField := valueOfElem.NumField()
 	for i := 0; i < numField; i++ {
 		t := typeOf.Field(i)
@@ -90,10 +118,8 @@ func (w *WrapperAutowireImpl) inject(impledPtr interface{}, sdId string) error {
 					TagValue:  val,
 				}
 				// create param from field info
-				subSDID := aw.ParseSDID(fieldInfo)
-				param := aw.ParseParam(subSDID, fieldInfo)
 				var err error
-				subImpledPtr, err = aw.Impl(subSDID, param)
+				subImpledPtr, err = aw.implWithField(fieldInfo)
 				if err != nil {
 					return err
 				}
@@ -114,7 +140,7 @@ func (w *WrapperAutowireImpl) inject(impledPtr interface{}, sdId string) error {
 		}
 		subService.Set(reflect.ValueOf(subImpledPtr))
 	}
-	// 2. monkey
+	// 3. monkey
 	if os.Getenv("GOARCH") == "amd64" || runtime.GOARCH == "amd64" {
 		// only service, only amd64 mod can inject monkey function
 		mf(impledPtr, sd.ID())

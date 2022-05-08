@@ -1,70 +1,30 @@
 package config
 
 import (
-	"log"
-	"strings"
-)
-
-import (
 	"github.com/glory-go/glory/autowire"
-	"github.com/glory-go/glory/autowire/util"
-	"github.com/glory-go/glory/config"
+	"github.com/glory-go/glory/autowire/normal"
 )
 
 func init() {
-	autowire.RegisterAutowire(&Autowire{})
+	autowire.RegisterAutowire(func() autowire.Autowire {
+		configAutowire := &Autowire{}
+		configAutowire.Autowire = normal.NewNormalAutowire(nil, &paramLoader{}, configAutowire)
+		return configAutowire
+	}())
 }
 
 const Name = "config"
 
 type Autowire struct {
+	autowire.Autowire
 }
 
-func (a *Autowire) Factory(sdId string) interface{} {
-	sd := a.GetAllStructDescribers()[sdId]
-	defer func() { // assure the impl procedure of one service run once
-		if r := recover(); r != nil {
-			log.Printf("recover panic = %s\n", r)
-		}
-	}()
-	return sd.Factory()
-}
-
-func (a *Autowire) Construct(sdId string, impledPtr, param interface{}) error {
-	sd := a.GetAllStructDescribers()[sdId]
-	if sd.ConstructFunc != nil {
-		return sd.ConstructFunc(impledPtr, param)
-	}
-	return nil
-}
-
-func (a *Autowire) ParseParam(sdID string, fi *autowire.FieldInfo) interface{} {
-	splitedTagValue := strings.Split(fi.TagValue, ",")
-	configPath := splitedTagValue[1]
-	sd := a.GetAllStructDescribers()[sdID]
-	if sd.ParamFactory == nil {
-		return nil
-	}
-	param := sd.ParamFactory()
-	if err := config.LoadConfigPathValue(configPath, param); err != nil {
-		log.Println("load config path "+configPath+" error = ", err)
-	}
-	return param
-}
-
-func (a *Autowire) ParseSDID(fi *autowire.FieldInfo) string {
-	splitedTagValue := strings.Split(fi.TagValue, ",")
-	return util.GetIdByNamePair(splitedTagValue[0], splitedTagValue[0])
-}
-
-func (a *Autowire) IsSingleton() bool {
-	return false
-}
-
+// TagKey re-write NormalAutowire
 func (a *Autowire) TagKey() string {
 	return Name
 }
 
+// GetAllStructDescribers re-write NormalAutowire
 func (a *Autowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return configStructDescriberMap
 }
@@ -72,6 +32,7 @@ func (a *Autowire) GetAllStructDescribers() map[string]*autowire.StructDescriber
 var configStructDescriberMap = make(map[string]*autowire.StructDescriber)
 
 func RegisterStructDescriber(s *autowire.StructDescriber) {
+	s.SetAutowireType(Name)
 	configStructDescriberMap[s.ID()] = s
 }
 

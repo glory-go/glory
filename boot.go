@@ -20,10 +20,5 @@ func Load() error {
 	}
 
 	// 3. load autowire
-	if err := autowire.Load(); err != nil {
-		return err
-	}
-
-	// 4. load services
-	return nil
+	return autowire.Load()
 }

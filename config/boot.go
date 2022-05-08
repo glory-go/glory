@@ -36,8 +36,8 @@ func Load() error {
 	return nil
 }
 
-// LoadConfigPathValue prefix is a.b.c, configStructPtr is interface ptr
-func LoadConfigPathValue(prefix string, configStructPtr interface{}) error {
+// LoadConfigByPrefix prefix is a.b.c, configStructPtr is interface ptr
+func LoadConfigByPrefix(prefix string, configStructPtr interface{}) error {
 	if configStructPtr == nil {
 		return nil
 	}

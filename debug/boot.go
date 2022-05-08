@@ -35,7 +35,7 @@ var guardMap = make(map[string]*common.DebugMetadata)
 func Load() error {
 	// start debug port if enabled
 	bootConfig := &Config{}
-	if err := config.LoadConfigPathValue("debug", bootConfig); err == nil && !bootConfig.Enable {
+	if err := config.LoadConfigByPrefix("debug", bootConfig); err == nil && !bootConfig.Enable {
 		return nil
 	}
 	if bootConfig.Port == "" {

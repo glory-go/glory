@@ -107,7 +107,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err := service.Invoke(ctx, param)
 	info := ""
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	select {
 	case info = <-controlCh:
 	default:
@@ -115,7 +115,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	assert.Equal(t, "", info)
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	select {
 	case info = <-controlCh:
 	default:
@@ -127,7 +127,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor.Invoke(interfaceImplId, methodName, true,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err = service.Invoke(ctx, param)
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	select {
 	case info = <-controlCh:
 	default:
@@ -135,7 +135,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	assert.True(t, strings.HasPrefix(info, "Invoke Service-ServiceFoo.Invoke"))
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	info = ""
 	select {
 	case info = <-controlCh:
@@ -149,7 +149,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor.Invoke(interfaceImplId, methodName, true,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	_, _ = service.Invoke(ctx, param)
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	info = ""
 	select {
 	case info = <-controlCh:

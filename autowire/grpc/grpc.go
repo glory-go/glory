@@ -2,53 +2,37 @@ package grpc
 
 import (
 	"github.com/glory-go/glory/autowire"
-	"github.com/glory-go/glory/autowire/util"
+	"github.com/glory-go/glory/autowire/singleton"
 )
 
 func init() {
-	autowire.RegisterAutowire(&Autowire{})
+	autowire.RegisterAutowire(func() autowire.Autowire {
+		grpcAutowire := &Autowire{}
+		grpcAutowire.Autowire = singleton.NewSingletonAutowire(&sdIDParser{}, &paramLoader{}, grpcAutowire)
+		return grpcAutowire
+	}())
 }
 
 const Name = "grpc"
 
 type Autowire struct {
+	autowire.Autowire
 }
 
+// TagKey re-write SingletonAutowire
 func (a *Autowire) TagKey() string {
 	return Name
 }
 
-func (a *Autowire) Factory(sdId string) interface{} {
-	return a.GetAllStructDescribers()[sdId].Factory()
-}
-
-func (a *Autowire) Construct(sdID string, impledPtr, _ interface{}) error {
-	sd := a.GetAllStructDescribers()[sdID]
-	if sd.ConstructFunc != nil {
-		return sd.ConstructFunc(impledPtr, nil)
-	}
-	return nil
-}
-
-func (a *Autowire) ParseParam(_ string, _ *autowire.FieldInfo) interface{} {
-	return nil
-}
-
+// GetAllStructDescribers re-write SingletonAutowire
 func (a *Autowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return grpcStructDescriberMap
-}
-
-func (a *Autowire) ParseSDID(field *autowire.FieldInfo) string {
-	return util.GetIdByNamePair(field.TagValue, field.TagValue)
-}
-
-func (a *Autowire) IsSingleton() bool {
-	return true
 }
 
 var grpcStructDescriberMap = make(map[string]*autowire.StructDescriber)
 
 func RegisterStructDescriber(s *autowire.StructDescriber) {
+	s.SetAutowireType(Name)
 	grpcStructDescriberMap[s.ID()] = s
 }
 

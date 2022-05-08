@@ -10,9 +10,10 @@ func Load() error {
 	for _, aw := range allWrapperAutowires {
 		for sdID := range aw.GetAllStructDescribers() {
 			if aw.IsSingleton() {
-				if _, err := aw.Impl(sdID, nil); err != nil {
-					return err
-				}
+				_, _ = aw.ImplWithoutParam(sdID)
+				// FIXME: Fallover strategy because some struct may needs tag to load param.
+				// these structs can be impled during it's parent implement procedure.
+				// but that about real error? from logs to discover error?
 			}
 		}
 	}
@@ -23,7 +24,7 @@ func Load() error {
 func Impl(autowireType, structDescriberID string, param interface{}) (interface{}, error) {
 	for _, wrapperAutowire := range allWrapperAutowires {
 		if wrapperAutowire.TagKey() == autowireType {
-			return wrapperAutowire.Impl(structDescriberID, param)
+			return wrapperAutowire.ImplWithParam(structDescriberID, param)
 		}
 	}
 	return nil, nil

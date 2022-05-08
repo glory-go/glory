@@ -1,77 +1,50 @@
 package normal
 
 import (
-	"encoding/json"
-	"log"
-	"strings"
-)
-
-import (
 	"github.com/glory-go/glory/autowire"
-	"github.com/glory-go/glory/autowire/util"
+	"github.com/glory-go/glory/autowire/base"
+	"github.com/glory-go/glory/autowire/param_loader"
+	"github.com/glory-go/glory/autowire/sdid_parser"
 )
 
 func init() {
-	autowire.RegisterAutowire(&NormalAutowire{})
+	autowire.RegisterAutowire(NewNormalAutowire(nil, nil, nil))
 }
 
 const Name = "normal"
 
+// NewNormalAutowire create a normal autowire based autowire, e.g. config, base.facade can be re-write to outer autowire
+func NewNormalAutowire(sp autowire.SDIDParser, pl autowire.ParamLoader, facade autowire.Autowire) autowire.Autowire {
+	if sp == nil {
+		sp = sdid_parser.GetDefaultSDIDParser()
+	}
+	if pl == nil {
+		pl = param_loader.GetDefaultParamLoader()
+	}
+	normalAutowire := &NormalAutowire{}
+	if facade == nil {
+		facade = normalAutowire
+	}
+	normalAutowire.AutowireBase = base.New(facade, sp, pl)
+	return normalAutowire
+}
+
 type NormalAutowire struct {
-}
-
-func (n *NormalAutowire) Factory(sdId string) interface{} {
-	return n.GetAllStructDescribers()[sdId].Factory()
-}
-
-func (n *NormalAutowire) Construct(sdID string, impledPtr, param interface{}) error {
-	sd := n.GetAllStructDescribers()[sdID]
-	if sd.ConstructFunc != nil {
-		return sd.ConstructFunc(impledPtr, param)
-	}
-	return nil
-}
-
-func (n *NormalAutowire) ParseParam(sdID string, fi *autowire.FieldInfo) interface{} {
-	sd := normalEntryDescriberMap[sdID]
-	if sd.ParamFactory == nil {
-		return nil
-	}
-	splitedTagValue := strings.Split(fi.TagValue, ",")
-	kvs := strings.Split(splitedTagValue[1], "&")
-	kvMaps := make(map[string]interface{})
-	for _, kv := range kvs {
-		splitedKV := strings.Split(kv, "=")
-		kvMaps[splitedKV[0]] = splitedKV[1]
-	}
-	data, err := json.Marshal(kvMaps)
-	if err != nil {
-		log.Printf("error json marshal %s\n", err)
-		return nil
-	}
-	param := sd.ParamFactory()
-	if err := json.Unmarshal(data, param); err != nil {
-		log.Printf("error jsonun marshal %s\n", err)
-		return nil
-	}
-	return param
-}
-
-func (n *NormalAutowire) ParseSDID(field *autowire.FieldInfo) string {
-	splitedTagValue := strings.Split(field.TagValue, ",")
-	return util.GetIdByNamePair(field.FieldType, splitedTagValue[0])
+	base.AutowireBase
 }
 
 func (n *NormalAutowire) IsSingleton() bool {
 	return false
 }
 
-func (n *NormalAutowire) TagKey() string {
-	return Name
-}
-
+// GetAllStructDescribers should be re-write by facade
 func (n *NormalAutowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return normalEntryDescriberMap
+}
+
+// TagKey should be re-writed by facade autowire
+func (n *NormalAutowire) TagKey() string {
+	return Name
 }
 
 var normalEntryDescriberMap = make(map[string]*autowire.StructDescriber)
@@ -79,6 +52,7 @@ var normalEntryDescriberMap = make(map[string]*autowire.StructDescriber)
 // developer APIs
 
 func RegisterStructDescriber(s *autowire.StructDescriber) {
+	s.SetAutowireType(Name)
 	normalEntryDescriberMap[s.ID()] = s
 }
 

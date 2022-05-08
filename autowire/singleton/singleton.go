@@ -2,11 +2,13 @@ package singleton
 
 import (
 	"github.com/glory-go/glory/autowire"
-	"github.com/glory-go/glory/autowire/util"
+	"github.com/glory-go/glory/autowire/base"
+	"github.com/glory-go/glory/autowire/param_loader"
+	"github.com/glory-go/glory/autowire/sdid_parser"
 )
 
 func init() {
-	autowire.RegisterAutowire(&SingletonAutowire{})
+	autowire.RegisterAutowire(NewSingletonAutowire(nil, nil, nil))
 }
 
 const Name = "singleton"
@@ -15,38 +17,40 @@ var singletonStructDescribersMap = make(map[string]*autowire.StructDescriber)
 
 // autowire APIs
 
-type SingletonAutowire struct {
-}
-
-func (s *SingletonAutowire) Factory(sdId string) interface{} {
-	// fixme: here returns one, but wrapper layer still autowire again? and call constructor again?
-	sd := s.GetAllStructDescribers()[sdId]
-	impledPtr := sd.Factory()
-	return impledPtr
-}
-
-func (s *SingletonAutowire) ParseParam(_ string, _ *autowire.FieldInfo) interface{} {
-	return nil
-}
-
-func (s *SingletonAutowire) Construct(sdID string, impledPtr, _ interface{}) error {
-	sd := s.GetAllStructDescribers()[sdID]
-	if sd.ConstructFunc != nil {
-		return sd.ConstructFunc(impledPtr, nil)
+// NewSingletonAutowire create a singleton autowire based autowire, e.g. grpc, base.facade can be re-write to outer autowire
+func NewSingletonAutowire(sp autowire.SDIDParser, pl autowire.ParamLoader, facade autowire.Autowire) autowire.Autowire {
+	if sp == nil {
+		sp = sdid_parser.GetDefaultSDIDParser()
 	}
-	return nil
+	if pl == nil {
+		pl = param_loader.GetDefaultParamLoader()
+	}
+	singletonAutowire := &SingletonAutowire{
+		paramLoader: pl,
+		sdIDParser:  sp,
+	}
+	if facade == nil {
+		facade = singletonAutowire
+	}
+	singletonAutowire.AutowireBase = base.New(facade, sp, pl)
+	return singletonAutowire
+
 }
 
+type SingletonAutowire struct {
+	base.AutowireBase
+	paramLoader autowire.ParamLoader
+	sdIDParser  autowire.SDIDParser
+}
+
+// GetAllStructDescribers should be re-write by facade
 func (s *SingletonAutowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return singletonStructDescribersMap
 }
 
+// TagKey should be re-writed by facade autowire
 func (s *SingletonAutowire) TagKey() string {
 	return Name
-}
-
-func (s *SingletonAutowire) ParseSDID(field *autowire.FieldInfo) string {
-	return util.GetIdByNamePair(field.FieldType, field.TagValue)
 }
 
 func (s *SingletonAutowire) IsSingleton() bool {
@@ -56,6 +60,7 @@ func (s *SingletonAutowire) IsSingleton() bool {
 // developer APIs
 
 func RegisterStructDescriber(sd *autowire.StructDescriber) {
+	sd.SetAutowireType(Name)
 	singletonStructDescribersMap[sd.ID()] = sd
 }
 

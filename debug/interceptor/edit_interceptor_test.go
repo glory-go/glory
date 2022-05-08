@@ -64,7 +64,7 @@ func TestEditInterceptorWithCondition(t *testing.T) {
 
 	rsp, err := service.Invoke(ctx, param)
 
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second * 3)
 	info := ""
 	select {
 	case info = <-controlSendCh:
