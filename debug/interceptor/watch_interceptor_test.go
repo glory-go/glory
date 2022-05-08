@@ -38,8 +38,8 @@ func TestWatchInterceptor(t *testing.T) {
 	watchInterceptor := GetWatchInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string)
-	controlCh := make(chan string)
+	sendCh := make(chan string, 10)
+	controlCh := make(chan string, 10)
 	go func() {
 		info := <-sendCh
 		controlCh <- info
@@ -78,8 +78,8 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor := GetWatchInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string)
-	controlCh := make(chan string)
+	sendCh := make(chan string, 10)
+	controlCh := make(chan string, 10)
 	go func() {
 		for {
 			info := <-sendCh
@@ -107,7 +107,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err := service.Invoke(ctx, param)
 	info := ""
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	select {
 	case info = <-controlCh:
 	default:
@@ -115,7 +115,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	assert.Equal(t, "", info)
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	select {
 	case info = <-controlCh:
 	default:
@@ -127,7 +127,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor.Invoke(interfaceImplId, methodName, true,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err = service.Invoke(ctx, param)
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	select {
 	case info = <-controlCh:
 	default:
@@ -135,7 +135,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	assert.True(t, strings.HasPrefix(info, "Invoke Service-ServiceFoo.Invoke"))
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	info = ""
 	select {
 	case info = <-controlCh:
@@ -149,7 +149,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor.Invoke(interfaceImplId, methodName, true,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	_, _ = service.Invoke(ctx, param)
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	info = ""
 	select {
 	case info = <-controlCh:

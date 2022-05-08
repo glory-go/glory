@@ -33,6 +33,7 @@ func Load() error {
 		fmt.Printf("yamlFile Unmarshal err: %v\n", err)
 		return err
 	}
+	parseConfigSource(config)
 	return nil
 }
 

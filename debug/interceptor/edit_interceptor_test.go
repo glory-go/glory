@@ -17,10 +17,10 @@ func TestEditInterceptorWithCondition(t *testing.T) {
 	editInterceptor := GetEditInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string)
-	recvCh := make(chan *EditData)
-	controlSendCh := make(chan string)
-	controlRecvCh := make(chan *EditData)
+	sendCh := make(chan string, 10)
+	recvCh := make(chan *EditData, 10)
+	controlSendCh := make(chan string, 10)
+	controlRecvCh := make(chan *EditData, 10)
 	go func() {
 		for {
 			info := <-sendCh
@@ -64,7 +64,7 @@ func TestEditInterceptorWithCondition(t *testing.T) {
 
 	rsp, err := service.Invoke(ctx, param)
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Millisecond * 500)
 	info := ""
 	select {
 	case info = <-controlSendCh:
