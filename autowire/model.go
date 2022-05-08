@@ -9,6 +9,12 @@ type Autowire interface {
 	TagKey() string
 	// IsSingleton means struct can be boot entrance, and only have one impl globally, only created once.
 	IsSingleton() bool
+	/*
+		CanBeEntrance means the autowire sturct's param needs not to parse field tag value as param.
+		By default, singleton can be boot entrance, and normal can't, because normal needs to try to parse tag value to find config key.
+		But for grpc autowire, as singloton, can't be entrance because it needs to parse grpc type from cong tag.
+	*/
+	CanBeEntrance() bool
 	Factory(sdId string) interface{}
 
 	/*

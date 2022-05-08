@@ -24,6 +24,10 @@ func (a *Autowire) TagKey() string {
 	return Name
 }
 
+func (a *Autowire) CanBeEntrance() bool {
+	return false
+}
+
 // GetAllStructDescribers re-write SingletonAutowire
 func (a *Autowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return grpcStructDescriberMap

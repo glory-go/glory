@@ -7,5 +7,8 @@ tidy:
 test:
 	go test ./...
 
-lint:
+imports:
+	imports-formatter .
+
+lint: tidy
 	golangci-lint run

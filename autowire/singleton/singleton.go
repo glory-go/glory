@@ -57,6 +57,10 @@ func (s *SingletonAutowire) IsSingleton() bool {
 	return true
 }
 
+func (s *SingletonAutowire) CanBeEntrance() bool {
+	return true
+}
+
 // developer APIs
 
 func RegisterStructDescriber(sd *autowire.StructDescriber) {

@@ -42,6 +42,10 @@ func (a *AutowireBase) ParseSDID(field *autowire.FieldInfo) (string, error) {
 
 func (a *AutowireBase) ParseParam(sdId string, fi *autowire.FieldInfo) (interface{}, error) {
 	sd := a.facadeAutowire.GetAllStructDescribers()[sdId]
+	if sd.ParamFactory == nil {
+		// doesn't register param factory, do not load param, return with success
+		return nil, nil
+	}
 	if sd.ParamLoader != nil {
 		// try to use sd ParamLoader
 		param, err := sd.ParamLoader.Load(sd, fi)

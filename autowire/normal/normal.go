@@ -47,6 +47,14 @@ func (n *NormalAutowire) TagKey() string {
 	return Name
 }
 
+func (s *NormalAutowire) RelyOnTag() bool {
+	return false
+}
+
+func (s *NormalAutowire) CanBeEntrance() bool {
+	return false
+}
+
 var normalEntryDescriberMap = make(map[string]*autowire.StructDescriber)
 
 // developer APIs
