@@ -50,7 +50,7 @@ func sendValues(interfaceImplId, methodName string, isParam bool, values []refle
 	}
 	for ; i < len(values); i++ {
 		if !values[i].IsValid() {
-			invokeDetail.Params = append(invokeDetail.Params, fmt.Sprintf("nil"))
+			invokeDetail.Params = append(invokeDetail.Params, "nil")
 			continue
 		}
 		invokeDetail.Params = append(invokeDetail.Params, spew.Sdump(values[i].Interface()))
