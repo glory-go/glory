@@ -2,7 +2,6 @@ package interceptor
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -13,13 +12,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+import (
+	"github.com/glory-go/glory/debug/api/glory/boot"
+)
+
 func TestEditInterceptorWithCondition(t *testing.T) {
 	editInterceptor := GetEditInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string, 10)
+	sendCh := make(chan *boot.WatchResponse, 10)
 	recvCh := make(chan *EditData, 10)
-	controlSendCh := make(chan string, 10)
+	controlSendCh := make(chan *boot.WatchResponse, 10)
 	controlRecvCh := make(chan *EditData, 10)
 	go func() {
 		for {
@@ -45,7 +48,6 @@ func TestEditInterceptorWithCondition(t *testing.T) {
 	service := &ServiceFoo{}
 	ctx := context.Background()
 
-	// match
 	param := &RequestParam{
 		User: &User{
 			Name: "lizhixin",
@@ -65,16 +67,17 @@ func TestEditInterceptorWithCondition(t *testing.T) {
 	rsp, err := service.Invoke(ctx, param)
 
 	time.Sleep(time.Millisecond * 500)
-	info := ""
+	info := &boot.WatchResponse{}
 	select {
 	case info = <-controlSendCh:
 	default:
 	}
-	fmt.Println(info)
-	assert.True(t, strings.Contains(info, "lizhixin"))
-	assert.True(t, strings.HasPrefix(info, "Invoke Service-ServiceFoo.Invoke"))
+	assert.Equal(t, "Service", info.InterfaceName)
+	assert.Equal(t, "ServiceFoo", info.ImplementationName)
+	assert.Equal(t, "Invoke", info.MethodName)
+	assert.Equal(t, true, info.IsParam)
+	assert.True(t, strings.Contains(info.Params[1], "lizhixin"))
 
 	assert.Nil(t, err)
-	fmt.Println(rsp)
 	assert.Equal(t, "laurence", rsp.Name)
 }

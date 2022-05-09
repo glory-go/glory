@@ -1,11 +1,11 @@
 package glory
 
 import (
-	"fmt"
+	"github.com/fatih/color"
 )
 
 var logo = "          _                                                 \n         | |                                                \n   __ _  | |   ___    _ __   _   _   ______    __ _    ___  \n  / _` | | |  / _ \\  | '__| | | | | |______|  / _` |  / _ \\ \n | (_| | | | | (_) | | |    | |_| |          | (_| | | (_) |\n  \\__, | |_|  \\___/  |_|     \\__, |           \\__, |  \\___/ \n   __/ |                      __/ |            __/ |        \n  |___/                      |___/            |___/         "
 
 func printLogo() {
-	fmt.Println(logo)
+	color.Cyan(logo)
 }

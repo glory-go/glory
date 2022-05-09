@@ -12,6 +12,10 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
+import (
+	"github.com/glory-go/glory/debug/api/glory/boot"
+)
+
 type WatchInterceptor struct {
 	watch sync.Map
 }
@@ -31,20 +35,25 @@ func (w *WatchInterceptor) Invoke(interfaceImplId, methodName string, isParam bo
 	return values
 }
 
-func sendValues(interfaceImplId, methodName string, isParam bool, values []reflect.Value, sendCh chan string) {
-	itemType := "Param"
-	invokeVerb := "Invoke"
-	if !isParam {
-		itemType = "Response"
-		invokeVerb = "After Invoke"
+func sendValues(interfaceImplId, methodName string, isParam bool, values []reflect.Value, sendCh chan *boot.WatchResponse) {
+	splitedSDID := strings.Split(interfaceImplId, "-")
+	invokeDetail := &boot.WatchResponse{
+		IsParam:            isParam,
+		InterfaceName:      splitedSDID[0],
+		MethodName:         methodName,
+		ImplementationName: splitedSDID[1],
 	}
-	invokeDetail := fmt.Sprintf("%s %s.%s\n", invokeVerb, interfaceImplId, methodName)
-	for i := 1; i < len(values); i++ {
+	i := 0
+	if isParam {
+		// param first value is struct ptr, should skip it.
+		i = 1
+	}
+	for ; i < len(values); i++ {
 		if !values[i].IsValid() {
-			invokeDetail += fmt.Sprintf("%s %d: nil\n", itemType, i)
+			invokeDetail.Params = append(invokeDetail.Params, fmt.Sprintf("nil"))
 			continue
 		}
-		invokeDetail += fmt.Sprintf("%s %d: %s", itemType, i, spew.Sdump(values[i].Interface()))
+		invokeDetail.Params = append(invokeDetail.Params, spew.Sdump(values[i].Interface()))
 	}
 	select {
 	case sendCh <- invokeDetail:
@@ -53,7 +62,7 @@ func sendValues(interfaceImplId, methodName string, isParam bool, values []refle
 }
 
 type WatchContext struct {
-	Ch           chan string
+	Ch           chan *boot.WatchResponse
 	FieldMatcher *FieldMatcher
 }
 

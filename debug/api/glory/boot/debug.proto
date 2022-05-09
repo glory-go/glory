@@ -35,8 +35,9 @@ message WatchRequest{
   string interfaceName = 1;
   string implementationName = 2;
   string method = 3;
-  bool isParam = 4;
-  repeated Matcher matchers = 5;
+  bool input = 4;
+  bool output = 5;
+  repeated Matcher matchers = 6;
 }
 
 message EditRequest{
@@ -52,5 +53,9 @@ message Matcher{
 }
 
 message WatchResponse{
-  string content = 1;
+  string interfaceName = 1;
+  string implementationName = 2;
+  string methodName = 3;
+  bool isParam = 4;
+  repeated string params = 5;
 }

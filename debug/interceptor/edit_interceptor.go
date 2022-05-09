@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+import (
+	"github.com/glory-go/glory/debug/api/glory/boot"
+)
+
 type EditInterceptor struct {
 	watchEdit sync.Map
 }
@@ -37,7 +41,7 @@ func (w *EditInterceptor) Invoke(interfaceImplId, methodName string, isParam boo
 }
 
 type EditContext struct {
-	SendCh       chan string
+	SendCh       chan *boot.WatchResponse
 	RecvCh       chan *EditData
 	FieldMatcher *FieldMatcher
 }

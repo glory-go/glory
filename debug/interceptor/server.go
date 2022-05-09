@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -27,36 +28,40 @@ type DebugServerImpl struct {
 }
 
 func (d *DebugServerImpl) ListServices(ctx context.Context, empty *emptypb.Empty) (*boot.ListServiceResponse, error) {
-	serviceMetadata := make([]*boot.ServiceMetadata, 0)
-	for _, v := range d.allInterfaceMetadataMap {
+	structsMetadatas := make(MetadataSorter, 0)
+	for key, v := range d.allInterfaceMetadataMap {
 		methods := make([]string, 0)
 		for key := range v.GuardMap {
 			methods = append(methods, key)
 		}
 
-		pair := strings.Split(v.ID, "-")
+		pair := strings.Split(key, "-")
 		interfaceName := pair[0]
 		implName := pair[1]
-		serviceMetadata = append(serviceMetadata, &boot.ServiceMetadata{
+		structsMetadatas = append(structsMetadatas, &boot.ServiceMetadata{
 			Methods:            methods,
 			InterfaceName:      interfaceName,
 			ImplementationName: implName,
 		})
 	}
+	sort.Sort(structsMetadatas)
+
 	return &boot.ListServiceResponse{
-		ServiceMetadata: serviceMetadata,
+		ServiceMetadata: structsMetadatas,
 	}, nil
 }
 
 func (d *DebugServerImpl) Watch(req *boot.WatchRequest, watchSever boot.DebugService_WatchServer) error {
 	interfaceImplId := util.GetIdByNamePair(req.GetInterfaceName(), req.GetImplementationName())
 	method := req.GetMethod()
-	isParam := req.GetIsParam()
-	sendCh := make(chan string)
+	input := req.GetInput()
+	output := req.GetOutput()
+	sendCh := make(chan *boot.WatchResponse)
 	fmt.Printf("interceptor server recv watch %+v\n", req)
 	fmt.Println(interfaceImplId)
 	fmt.Println(method)
-	fmt.Println(isParam)
+	fmt.Println(input)
+	fmt.Println(output)
 	var fieldMatcher *FieldMatcher
 	for _, matcher := range req.GetMatchers() {
 		// todo multi match support
@@ -65,22 +70,35 @@ func (d *DebugServerImpl) Watch(req *boot.WatchRequest, watchSever boot.DebugSer
 			MatchRule:  matcher.GetMatchPath() + "=" + matcher.GetMatchValue(),
 		}
 	}
-	d.watchInterceptor.Watch(interfaceImplId, method, isParam, &WatchContext{
-		Ch:           sendCh,
-		FieldMatcher: fieldMatcher,
-	})
+	if input {
+		d.watchInterceptor.Watch(interfaceImplId, method, true, &WatchContext{
+			Ch:           sendCh,
+			FieldMatcher: fieldMatcher,
+		})
+	}
+
+	if output {
+		d.watchInterceptor.Watch(interfaceImplId, method, false, &WatchContext{
+			Ch:           sendCh,
+			FieldMatcher: fieldMatcher,
+		})
+	}
 
 	done := watchSever.Context().Done()
 	for {
 		select {
 		case <-done:
 			// watch stop
-			d.watchInterceptor.UnWatch(interfaceImplId, method, isParam)
+			if input {
+				d.watchInterceptor.UnWatch(interfaceImplId, method, true)
+			}
+			if output {
+				d.watchInterceptor.UnWatch(interfaceImplId, method, false)
+			}
+
 			return nil
-		case data := <-sendCh:
-			if err := watchSever.Send(&boot.WatchResponse{
-				Content: data,
-			}); err != nil {
+		case watchRsp := <-sendCh:
+			if err := watchSever.Send(watchRsp); err != nil {
 				return err
 			}
 		}
@@ -88,7 +106,7 @@ func (d *DebugServerImpl) Watch(req *boot.WatchRequest, watchSever boot.DebugSer
 }
 
 type sendRecvCh struct {
-	sendCh chan string
+	sendCh chan *boot.WatchResponse
 	recvCh chan *EditData
 }
 
@@ -114,7 +132,7 @@ func (d *DebugServerImpl) WatchEdit(watchEditServerReq boot.DebugService_WatchEd
 				d.editInterceptor.UnWatchEdit(interfaceImplId, method, isParam)
 			}
 			var fieldMatcher *FieldMatcher
-			sendCh := make(chan string)
+			sendCh := make(chan *boot.WatchResponse)
 			recvCh := make(chan *EditData)
 			for _, matcher := range req.GetMatchers() {
 				// todo multi match support
@@ -133,9 +151,7 @@ func (d *DebugServerImpl) WatchEdit(watchEditServerReq boot.DebugService_WatchEd
 			// start send gr
 			go func() {
 				toShowData := <-sendCh
-				if err := watchEditServerReq.Send(&boot.WatchResponse{
-					Content: toShowData,
-				}); err != nil {
+				if err := watchEditServerReq.Send(toShowData); err != nil {
 					log.Printf("send error = %s\n", err)
 					return
 				}

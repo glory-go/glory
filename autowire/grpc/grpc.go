@@ -28,6 +28,10 @@ func (a *Autowire) CanBeEntrance() bool {
 	return false
 }
 
+func (a *Autowire) InjectPosition() autowire.InjectPosition {
+	return autowire.AfterConstructorCalled
+}
+
 // GetAllStructDescribers re-write SingletonAutowire
 func (a *Autowire) GetAllStructDescribers() map[string]*autowire.StructDescriber {
 	return grpcStructDescriberMap

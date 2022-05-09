@@ -64,6 +64,6 @@ func RegisterStructDescriber(s *autowire.StructDescriber) {
 	normalEntryDescriberMap[s.ID()] = s
 }
 
-func GetImpl(extensionId string, param interface{}) (interface{}, error) {
-	return autowire.Impl(Name, extensionId, param)
+func GetImpl(sdID string, param interface{}) (interface{}, error) {
+	return autowire.Impl(Name, sdID, param)
 }

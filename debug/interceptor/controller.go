@@ -1,11 +1,12 @@
 package interceptor
 
 import (
-	"log"
 	"net"
 )
 
 import (
+	"github.com/fatih/color"
+
 	"google.golang.org/grpc"
 )
 
@@ -23,11 +24,13 @@ func Start(port string, allInterfaceMetadataMap map[string]*common.DebugMetadata
 	})
 	lst, err := net.Listen("tcp", ":"+port)
 	if err != nil {
+		color.Red("[Debug] Debug server listening port :%s failed with error = %s", port, err)
 		return err
 	}
 	go func() {
+		color.Blue("[Debug] Debug server listening at :%s", port)
 		if err := grpcServer.Serve(lst); err != nil {
-			log.Println("debug server start failed with error = ", err)
+			color.Red("[Debug] Debug server run with error = ", err)
 			return
 		}
 	}()

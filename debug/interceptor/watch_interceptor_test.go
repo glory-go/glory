@@ -2,15 +2,17 @@ package interceptor
 
 import (
 	"context"
-	"fmt"
 	"reflect"
-	"strings"
 	"testing"
 	"time"
 )
 
 import (
 	"github.com/stretchr/testify/assert"
+)
+
+import (
+	"github.com/glory-go/glory/debug/api/glory/boot"
 )
 
 type User struct {
@@ -38,8 +40,8 @@ func TestWatchInterceptor(t *testing.T) {
 	watchInterceptor := GetWatchInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string, 10)
-	controlCh := make(chan string, 10)
+	sendCh := make(chan *boot.WatchResponse, 10)
+	controlCh := make(chan *boot.WatchResponse, 10)
 	go func() {
 		info := <-sendCh
 		controlCh <- info
@@ -65,21 +67,24 @@ func TestWatchInterceptor(t *testing.T) {
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err := service.Invoke(ctx, param)
 	info := <-controlCh
-	fmt.Println(info)
-	assert.True(t, strings.HasPrefix(info, "Invoke Service-ServiceFoo.Invoke"))
+	assert.Equal(t, info.InterfaceName, "Service")
+	assert.Equal(t, info.ImplementationName, "ServiceFoo")
+	assert.Equal(t, info.MethodName, "Invoke")
+
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
 	info = <-controlCh
-	fmt.Println(info)
-	assert.True(t, strings.HasPrefix(info, "After Invoke Service-ServiceFoo.Invoke"))
+	assert.Equal(t, "Service", info.InterfaceName)
+	assert.Equal(t, "ServiceFoo", info.ImplementationName)
+	assert.Equal(t, "Invoke", info.MethodName)
 }
 
 func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor := GetWatchInterceptor()
 	interfaceImplId := "Service-ServiceFoo"
 	methodName := "Invoke"
-	sendCh := make(chan string, 10)
-	controlCh := make(chan string, 10)
+	sendCh := make(chan *boot.WatchResponse, 10)
+	controlCh := make(chan *boot.WatchResponse, 10)
 	go func() {
 		for {
 			info := <-sendCh
@@ -106,13 +111,13 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	watchInterceptor.Invoke(interfaceImplId, methodName, true,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	rsp, err := service.Invoke(ctx, param)
-	info := ""
+	info := &boot.WatchResponse{}
 	time.Sleep(time.Millisecond * 500)
 	select {
 	case info = <-controlCh:
 	default:
 	}
-	assert.Equal(t, "", info)
+	assert.Equal(t, "", info.InterfaceName)
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
 	time.Sleep(time.Millisecond * 500)
@@ -120,7 +125,7 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	case info = <-controlCh:
 	default:
 	}
-	assert.Equal(t, "", info)
+	assert.Equal(t, "", info.InterfaceName)
 
 	// match
 	param.User.Name = "lizhixin"
@@ -132,16 +137,18 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 	case info = <-controlCh:
 	default:
 	}
-	assert.True(t, strings.HasPrefix(info, "Invoke Service-ServiceFoo.Invoke"))
+	assert.Equal(t, "Service", info.InterfaceName)
+	assert.Equal(t, "ServiceFoo", info.ImplementationName)
+	assert.Equal(t, "Invoke", info.MethodName)
 	watchInterceptor.Invoke(interfaceImplId, methodName, false,
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(rsp), reflect.ValueOf(err)})
 	time.Sleep(time.Millisecond * 500)
-	info = ""
+	info = &boot.WatchResponse{}
 	select {
 	case info = <-controlCh:
 	default:
 	}
-	assert.Equal(t, "", info)
+	assert.Equal(t, "", info.InterfaceName)
 
 	// not match
 	param.User.Name = "lizhixin"
@@ -150,10 +157,10 @@ func TestWatchInterceptorWithCondition(t *testing.T) {
 		[]reflect.Value{reflect.ValueOf(service), reflect.ValueOf(ctx), reflect.ValueOf(param)})
 	_, _ = service.Invoke(ctx, param)
 	time.Sleep(time.Millisecond * 500)
-	info = ""
+	info = &boot.WatchResponse{}
 	select {
 	case info = <-controlCh:
 	default:
 	}
-	assert.Equal(t, "", info)
+	assert.Equal(t, "", info.InterfaceName)
 }

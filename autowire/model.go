@@ -41,6 +41,7 @@ type Autowire interface {
 	ParseParam(sdID string, fi *FieldInfo) (interface{}, error)
 	Construct(sdID string, impledPtr, param interface{}) (interface{}, error)
 	GetAllStructDescribers() map[string]*StructDescriber
+	InjectPosition() InjectPosition
 }
 
 var wrapperAutowireMap = make(map[string]WrapperAutowire)
@@ -104,3 +105,10 @@ type ParamLoader interface {
 type SDIDParser interface {
 	Parse(fi *FieldInfo) (string, error)
 }
+
+type InjectPosition int
+
+const (
+	AfterFactoryCalled     InjectPosition = 0
+	AfterConstructorCalled InjectPosition = 1
+)

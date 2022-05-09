@@ -1,13 +1,13 @@
 package config
 
 import (
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"strings"
 )
 
 import (
+	"github.com/fatih/color"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -22,15 +22,16 @@ func SetConfig(yamlBytes []byte) error {
 func Load() error {
 	configPath := GetConfigPath()
 
+	color.Blue("[Config] Load config file from %s", configPath)
 	yamlFile, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		fmt.Printf("error: yamlFile get error= %v\n", err)
-		return errors.New("yamlFile.Get err ")
+		color.Red("Load glory config file failed. %v\n The load procedure is continue\n", err)
+		return nil
 	}
 
 	err = yaml.Unmarshal(yamlFile, &config)
 	if err != nil {
-		fmt.Printf("yamlFile Unmarshal err: %v\n", err)
+		color.Red("yamlFile Unmarshal err: %v\n", err)
 		return err
 	}
 	parseConfigSource(config)

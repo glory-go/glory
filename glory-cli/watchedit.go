@@ -14,6 +14,7 @@ import (
 	"github.com/glory-go/glory/debug/api/glory/boot"
 )
 
+// watchEdit todo
 var watchEdit = &cobra.Command{
 	Use: "watchEdit",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -26,7 +27,6 @@ var watchEdit = &cobra.Command{
 			InterfaceName:      args[0],
 			ImplementationName: args[1],
 			Method:             args[2],
-			IsParam:            args[3] == "true",
 			IsEdit:             false,
 		}); err != nil {
 			panic(err)
@@ -37,7 +37,7 @@ var watchEdit = &cobra.Command{
 				log.Printf("recv error = %s\n", err)
 				return
 			}
-			fmt.Println(rsp.Content)
+			fmt.Println(rsp.Params)
 		}
 	},
 }

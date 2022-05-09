@@ -4,11 +4,26 @@ import (
 	"fmt"
 )
 
+import (
+	"github.com/fatih/color"
+)
+
 var allWrapperAutowires = make(map[string]WrapperAutowire)
+
+func printAutowireRegisteredStructDescriber() {
+	for autowireType, aw := range allWrapperAutowires {
+		color.Blue("[Autowire Type] Found registered autowire type %s", autowireType)
+		for sdID := range aw.GetAllStructDescribers() {
+			color.Blue("[Autowire Struct Descriptor] Found type %s registered SD %s", autowireType, sdID)
+		}
+	}
+}
 
 func Load() error {
 	// get all autowires
 	allWrapperAutowires = GetAllWrapperAutowires()
+
+	printAutowireRegisteredStructDescriber()
 
 	// autowire all struct that can be entrance
 	for _, aw := range allWrapperAutowires {
@@ -16,7 +31,7 @@ func Load() error {
 			if aw.CanBeEntrance() {
 				_, err := aw.ImplWithoutParam(sdID)
 				if err != nil {
-					panic(fmt.Errorf("[Boot ImplWithoutParam] sd %s failed, reason is %s", sdID, err))
+					panic(fmt.Errorf("[Autowire] Impl sd %s failed, reason is %s", sdID, err))
 				}
 			}
 		}

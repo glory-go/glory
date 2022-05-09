@@ -6,6 +6,8 @@ import (
 )
 
 import (
+	"github.com/fatih/color"
+
 	perrors "github.com/pkg/errors"
 
 	"gopkg.in/yaml.v3"
@@ -20,11 +22,7 @@ const EnvKeyGloryConfigPath = "GLORY_CONFIG_PATH" // default val is "config/glor
 // 2. choose config path like "config/glory_dev.yaml
 const EnvKeyGloryEnv = "GLORY_ENV" //
 
-// EnvKeyGloryConfigCenterConfigPath is absolute/relate path to glory_config_center.yaml
-const EnvKeyGloryConfigCenterConfigPath = "GLORY_CONFIG_CENTER_CONFIG_PATH"
-
-const DefaultConfigPath = "config/glory.yaml"
-const DefaultConfigCenterConfigPath = "config/config_center.yaml"
+const DefaultConfigPath = "../conf/glory.yaml"
 
 func GetGloryEnv() string {
 	return os.Getenv(EnvKeyGloryEnv)
@@ -35,8 +33,9 @@ func GetConfigPath() string {
 	env := GetGloryEnv()
 
 	configFilePath := DefaultConfigPath
-	if os.Getenv(EnvKeyGloryConfigPath) != "" {
-		configFilePath = os.Getenv(EnvKeyGloryConfigPath)
+	if gloryConfigPath := os.Getenv(EnvKeyGloryConfigPath); gloryConfigPath != "" {
+		color.Blue("[Config] Environment %s is set to %s", EnvKeyGloryConfigPath, gloryConfigPath)
+		configFilePath = gloryConfigPath
 	}
 	prefix := strings.Split(configFilePath, ".yaml")
 	// prefix == ["config/glory", ""]
@@ -45,6 +44,7 @@ func GetConfigPath() string {
 	}
 	// get target env yaml file
 	if env != "" {
+		color.Blue("[Config] Environment %s is set to %s", EnvKeyGloryEnv, env)
 		configPath = prefix[0] + "_" + env + ".yaml"
 	} else {
 		configPath = configFilePath

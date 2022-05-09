@@ -56,3 +56,7 @@ func (a *AutowireBase) ParseParam(sdId string, fi *autowire.FieldInfo) (interfac
 	// use autowire defined paramLoader as fall back
 	return a.paramLoader.Load(sd, fi)
 }
+
+func (a *AutowireBase) InjectPosition() autowire.InjectPosition {
+	return autowire.AfterFactoryCalled
+}

@@ -47,9 +47,10 @@ func (w *WrapperAutowireImpl) ImplWithParam(sdID string, param interface{}) (int
 	// 2. factory
 	impledPtr := w.Autowire.Factory(sdID)
 
-	// 3. inject
-	if err := w.inject(impledPtr, sdID); err != nil {
-		return nil, err
+	if w.Autowire.InjectPosition() == AfterFactoryCalled {
+		if err := w.inject(impledPtr, sdID); err != nil {
+			return nil, err
+		}
 	}
 
 	// 4. construct field
@@ -57,6 +58,12 @@ func (w *WrapperAutowireImpl) ImplWithParam(sdID string, param interface{}) (int
 	impledPtr, err = w.Autowire.Construct(sdID, impledPtr, param)
 	if err != nil {
 		return nil, err
+	}
+
+	if w.Autowire.InjectPosition() == AfterConstructorCalled {
+		if err := w.inject(impledPtr, sdID); err != nil {
+			return nil, err
+		}
 	}
 
 	// 5. record singleton ptr

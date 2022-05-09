@@ -9,7 +9,6 @@ import (
 )
 
 type DebugMetadata struct {
-	ID       string
 	GuardMap map[string]*GuardInfo
 }
 
