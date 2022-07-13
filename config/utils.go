@@ -27,3 +27,4 @@ func GetConfigPath() string {
 
 	return path
 }
+

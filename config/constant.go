@@ -1,5 +1,11 @@
 package config
 
+import (
+	"regexp"
+
+	set "github.com/deckarep/golang-set/v2"
+)
+
 const (
 	DEFAULT_PATH = "glory/glory.yaml"
 	GLORY_ENV    = "GLORY_ENV"
@@ -9,4 +15,10 @@ const (
 
 var (
 	defaultConfigPath = DEFAULT_PATH
+
+	keepedConfigCenterName   = set.NewSet("", "env")
+	skipInitConfigCenterName = set.NewSet("env")
+	keepedComponentName      = set.NewSet("", "config_center", "service_name")
+
+	placeHolderRegexp = regexp.MustCompile(`^\$(.*)\{(.+)\}$`)
 )
