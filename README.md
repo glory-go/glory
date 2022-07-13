@@ -31,38 +31,38 @@ Glory提供以下能力：
 
 ### 可扩展的配置和组件能力
 
-[x] config core，抽象化配置能力，支持社区开发者基于抽象接口定义开发出适合自身要求的配置中心，并在项目启动时按需准确加载配置
+- [x] config core，抽象化配置能力，支持社区开发者基于抽象接口定义开发出适合自身要求的配置中心，并在项目启动时按需准确加载配置
 
-[x] 基础组件注入，抽象化基础组件的注入和初始化，支持社区开发者根据组件抽象接口定义开发出各种各样的组件，并结合config core完成项目外部依赖的初始化工作
+- [x] 基础组件注入，抽象化基础组件的注入和初始化，支持社区开发者根据组件抽象接口定义开发出各种各样的组件，并结合config core完成项目外部依赖的初始化工作
 
 ### 常用组件集成
 
 基于上述提供的配置和组件能力，提供常用的服务端组件
 
-[ ] 接入gorm提供数据库操作能力
+- [ ] 接入gorm提供数据库操作能力
 
-[ ] 提供redis操作能力
+- [ ] 提供redis操作能力
 
-[ ] 日志与基于opentracing的链路追踪能力
+- [ ] 日志与基于opentracing的链路追踪能力
 
-[ ] 基于Prometheus的打点上报能力
+- [ ] 基于Prometheus的打点上报能力
 
 ### 后端服务暴露
 
-[x] 基于gin提供http服务的能力
+- [x] 基于gin提供http服务的能力
 
-[ ] 提供grpc的能力
+- [ ] 提供grpc的能力
 
-[ ] 提供pubsub中的sub抽象
+- [ ] 提供pubsub中的sub抽象
 
 ### 不同broker的pubsub实现([glory-go/mq](https://github.com/glory-go/mq))
 
-[ ] 基于[hibiken/asynq](https://github.com/hibiken/asynq)实现的分布式任务队列的pubsub
+- [ ] 基于[hibiken/asynq](https://github.com/hibiken/asynq)实现的分布式任务队列的pubsub
 
-[ ] 基于redis原生支持的stream实现的广播模式的pubsub
+- [ ] 基于redis原生支持的stream实现的广播模式的pubsub
 
 ### 服务发现
 
-[ ] 基于Nacos的服务发现能力
+- [ ] 基于Nacos的服务发现能力
 
-[ ] 基于Istiod的服务发现能力
+- [ ] 基于Istiod的服务发现能力
