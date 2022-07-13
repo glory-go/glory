@@ -50,7 +50,6 @@ func (s *ginHttpService) Init(config map[string]interface{}) error {
 		if err := mapstructure.Decode(v, conf); err != nil {
 			return err
 		}
-		// 配置默认值
 		s.configs[k] = conf
 	}
 	return nil
