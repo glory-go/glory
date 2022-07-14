@@ -34,7 +34,7 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // Init mocks base method.
-func (m *MockService) Init(config map[string]interface{}) error {
+func (m *MockService) Init(config map[string]any) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Init", config)
 	ret0, _ := ret[0].(error)

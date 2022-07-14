@@ -53,7 +53,7 @@ Glory提供以下能力：
 
 - [ ] 提供grpc的能力
 
-- [ ] 提供pubsub中的sub抽象
+- [x] 提供pubsub中的sub抽象
 
 ### 不同broker的pubsub实现([glory-go/mq](https://github.com/glory-go/mq))
 
