@@ -47,6 +47,8 @@ Glory提供以下能力：
 
 - [ ] 基于Prometheus的打点上报能力
 
+- [ ] 提供pubsub中的pub抽象
+
 ### 后端服务暴露
 
 - [x] 基于gin提供http服务的能力
