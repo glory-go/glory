@@ -11,6 +11,6 @@ import (
 
 type SubProvider interface {
 	service.Service
-	// Subscribe 实现了sub的订阅逻辑
-	Subscribe(ctx context.Context, topic string, h pubsub.MsgHandler)
+	// Subscribe 实现了sub的订阅逻辑。instance用以支持单次监听多个broker
+	Subscribe(ctx context.Context, instance, topic string, h pubsub.MsgHandler)
 }

@@ -78,13 +78,13 @@ func (mr *MockSubProviderMockRecorder) Run() *gomock.Call {
 }
 
 // Subscribe mocks base method.
-func (m *MockSubProvider) Subscribe(ctx context.Context, topic string, h pubsub.MsgHandler) {
+func (m *MockSubProvider) Subscribe(ctx context.Context, instance, topic string, h pubsub.MsgHandler) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Subscribe", ctx, topic, h)
+	m.ctrl.Call(m, "Subscribe", ctx, instance, topic, h)
 }
 
 // Subscribe indicates an expected call of Subscribe.
-func (mr *MockSubProviderMockRecorder) Subscribe(ctx, topic, h interface{}) *gomock.Call {
+func (mr *MockSubProviderMockRecorder) Subscribe(ctx, instance, topic, h interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockSubProvider)(nil).Subscribe), ctx, topic, h)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockSubProvider)(nil).Subscribe), ctx, instance, topic, h)
 }
