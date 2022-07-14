@@ -5,11 +5,9 @@
 package mock_sub
 
 import (
-	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	pubsub "github.com/lileio/pubsub"
 )
 
 // MockSubProvider is a mock of SubProvider interface.
@@ -75,16 +73,4 @@ func (m *MockSubProvider) Run() error {
 func (mr *MockSubProviderMockRecorder) Run() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Run", reflect.TypeOf((*MockSubProvider)(nil).Run))
-}
-
-// Subscribe mocks base method.
-func (m *MockSubProvider) Subscribe(ctx context.Context, instance, topic string, h pubsub.MsgHandler) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Subscribe", ctx, instance, topic, h)
-}
-
-// Subscribe indicates an expected call of Subscribe.
-func (mr *MockSubProviderMockRecorder) Subscribe(ctx, instance, topic, h interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockSubProvider)(nil).Subscribe), ctx, instance, topic, h)
 }
