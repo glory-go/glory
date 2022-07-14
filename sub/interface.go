@@ -7,6 +7,8 @@ import (
 	"github.com/lileio/pubsub"
 )
 
+//go:generate mockgen -source interface.go -destination mock/interface.go
+
 type SubProvider interface {
 	service.Service
 	// Subscribe 实现了sub的订阅逻辑

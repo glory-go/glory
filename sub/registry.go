@@ -4,11 +4,11 @@ import "fmt"
 
 func (s *subSrv) RegisterSubProvider(srv SubProvider) {
 	if srv == nil {
-		panic("register nil service")
+		panic("register nil provider")
 	}
 	_, ok := s.subProviderRegistry.LoadOrStore(srv.Name(), srv)
 	if ok {
-		panic(fmt.Sprintf("service [%s] already register before", srv.Name()))
+		panic(fmt.Sprintf("provider [%s] already register before", srv.Name()))
 	}
 }
 

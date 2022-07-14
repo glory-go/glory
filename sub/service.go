@@ -28,6 +28,18 @@ func GetSub() *subSrv {
 	return sub
 }
 
+func (s *subSrv) GetSubProvider(name string) SubProvider {
+	raw, ok := s.subProviderRegistry.Load(name)
+	if !ok {
+		return nil
+	}
+	provider, ok := raw.(SubProvider)
+	if !ok {
+		return nil
+	}
+	return provider
+}
+
 func (s *subSrv) Name() string { return SubSrvName }
 
 func (s *subSrv) Init(config map[string]any) error {
