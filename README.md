@@ -39,7 +39,7 @@ Glory提供以下能力：
 
 基于上述提供的配置和组件能力，提供常用的服务端组件
 
-- [ ] 接入gorm提供数据库操作能力
+- [x] 接入gorm提供数据库操作能力
 
 - [ ] 提供redis操作能力
 
@@ -47,19 +47,17 @@ Glory提供以下能力：
 
 - [ ] 基于Prometheus的打点上报能力
 
-- [ ] 提供pubsub中的pub抽象
-
 ### 后端服务暴露
 
 - [x] 基于gin提供http服务的能力
 
-- [ ] 提供grpc的能力
+- [x] 提供grpc的能力
 
 - [x] 提供pubsub中的sub抽象
 
 ### 不同broker的pubsub实现([glory-go/mq](https://github.com/glory-go/mq))
 
-- [ ] 基于[hibiken/asynq](https://github.com/hibiken/asynq)实现的分布式任务队列的pubsub
+- [x] 基于[hibiken/asynq](https://github.com/hibiken/asynq)实现的分布式任务队列的pubsub
 
 - [ ] 基于redis原生支持的stream实现的广播模式的pubsub
 
