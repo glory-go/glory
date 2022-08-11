@@ -25,7 +25,7 @@ var (
 	once sync.Once
 )
 
-func GetGRPCService() *grpcService {
+func getGRPCService() *grpcService {
 	once.Do(func() {
 		srv = &grpcService{
 			configs: make(map[string]*grpcServiceConfig),
@@ -38,12 +38,13 @@ func GetGRPCService() *grpcService {
 }
 
 // WithOption 提供使用者指定grpc服务初始化时使用的option的能力。name为空代表为所有的服务端进行注册
-func (s *grpcService) WithOptions(name string, options ...grpc.ServerOption) {
+func WithOptions(name string, options ...grpc.ServerOption) {
+	s := getGRPCService()
 	s.options[name] = append(s.options[name], options...)
 }
 
-func (s *grpcService) GetServer(name string) *grpc.Server {
-	return s.servers[name]
+func GetServer(name string) *grpc.Server {
+	return getGRPCService().servers[name]
 }
 
 func (s *grpcService) Name() string { return GRPCServiceName }

@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var (
+const (
 	MysqlGormComponentName = "mysql_gorm"
 )
 

@@ -25,7 +25,7 @@ var (
 	once sync.Once
 )
 
-func GetGinHttpService() *ginHttpService {
+func getGinHttpService() *ginHttpService {
 	once.Do(func() {
 		srv = &ginHttpService{
 			routers: make(map[string]*gin.Engine),
@@ -36,8 +36,8 @@ func GetGinHttpService() *ginHttpService {
 	return srv
 }
 
-func (s *ginHttpService) GetEngine(name string) *gin.Engine {
-	return s.routers[name]
+func GetEngine(name string) *gin.Engine {
+	return getGinHttpService().routers[name]
 }
 
 func (s *ginHttpService) Name() string { return GinHTTPServiceName }
