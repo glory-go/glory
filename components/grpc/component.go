@@ -6,6 +6,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -59,6 +60,7 @@ func (c *grpcComponent) Init(config map[string]any) error {
 		}
 		// 初始化客户端连接
 		options := append(c.options[""], c.options[name]...)
+		options = append(options, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", conf.Host, conf.Port), options...)
 		if err != nil {
 			return err
