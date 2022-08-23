@@ -21,6 +21,14 @@ func hookBuilder(raw map[string]any) (logrus.Hook, error) {
 		return nil, err
 	}
 
+	levelPath := lfshook.PathMap{}
+	for level, path := range conf.LevelPath {
+		parsedLevel, err := logrus.ParseLevel(level)
+		if err != nil {
+			return nil, err
+		}
+		levelPath[parsedLevel] = path
+	}
 	hook := lfshook.NewHook(conf.LevelPath, &logrus.JSONFormatter{})
 	return hook, nil
 }
