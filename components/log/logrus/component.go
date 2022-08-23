@@ -41,7 +41,7 @@ func (c *logrusComponent) Init(conf map[string]any) error {
 	rawHooksConf, ok := conf[HooksConfigKey]
 	hooksConf := map[string]any{}
 	if ok {
-		if err := mapstructure.Decode(rawHooksConf, hooksConf); err != nil {
+		if err := mapstructure.Decode(rawHooksConf, &hooksConf); err != nil {
 			return err
 		}
 	}

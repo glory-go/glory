@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -68,7 +70,7 @@ func RegisterComponent(component Component) {
 func iterComponentRegistry(f func(name string, component Component) error) {
 	componentRegistry.Range(func(key, value any) bool {
 		if err := f(key.(string), value.(Component)); err != nil {
-			panic(err)
+			panic(errors.WithMessagef(err, "fail to iter component %s", key))
 		}
 		return true
 	})
