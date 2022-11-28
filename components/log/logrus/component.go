@@ -36,6 +36,8 @@ func (c *logrusComponent) Init(conf map[string]any) error {
 			return err
 		}
 	}
+	logrus.SetLevel(logrusConf.Level)
+
 	// 初始化logrus
 	// 逐一初始化用户定义的hooks
 	rawHooksConf, ok := conf[HooksConfigKey]
@@ -45,7 +47,6 @@ func (c *logrusComponent) Init(conf map[string]any) error {
 			return err
 		}
 	}
-	logrus.SetLevel(logrusConf.Level)
 	for name, raw := range hooksConf {
 		mapConf := make(map[string]any)
 		if err := mapstructure.Decode(raw, &mapConf); err != nil {
