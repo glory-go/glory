@@ -45,6 +45,7 @@ func (c *logrusComponent) Init(conf map[string]any) error {
 			return err
 		}
 	}
+	logrus.SetLevel(logrusConf.Level)
 	for name, raw := range hooksConf {
 		mapConf := make(map[string]any)
 		if err := mapstructure.Decode(raw, &mapConf); err != nil {
