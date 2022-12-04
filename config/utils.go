@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 func ChangeDefaultConfigPath(path string) {
@@ -28,3 +30,8 @@ func GetConfigPath() string {
 	return path
 }
 
+// GetConvertedConfig 获取经配置中心处理过的配置实例
+func GetConvertedConfig() *viper.Viper {
+	Init()
+	return configData
+}
