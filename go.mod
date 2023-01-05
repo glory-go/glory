@@ -22,6 +22,7 @@ require (
 )
 
 require (
+	github.com/aliyun/fc-runtime-go-sdk v0.2.7 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect

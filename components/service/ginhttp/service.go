@@ -44,7 +44,9 @@ func (s *ginHttpService) Name() string { return GinHTTPServiceName }
 
 func (s *ginHttpService) Init(config map[string]interface{}) error {
 	for k, v := range config {
-		s.routers[k] = gin.Default()
+		r := gin.Default()
+		r.ContextWithFallback = true
+		s.routers[k] = r
 		// 解析配置
 		conf := &ginHttpServiceConfig{}
 		if err := mapstructure.Decode(v, conf); err != nil {
