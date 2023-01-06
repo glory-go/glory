@@ -24,12 +24,16 @@ var (
 	once sync.Once
 )
 
-func getGinHttpService() *aliyunFCHttpService {
+func getAliyunFCHttpService() *aliyunFCHttpService {
 	once.Do(func() {
 		srv = &aliyunFCHttpService{}
 	})
 
 	return srv
+}
+
+func GetEngine() *gin.Engine {
+	return getAliyunFCHttpService().router
 }
 
 func (s *aliyunFCHttpService) Name() string { return AliyunFCHTTPServiceName }
