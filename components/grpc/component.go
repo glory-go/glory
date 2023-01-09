@@ -30,9 +30,11 @@ var (
 func getGrpcComponent() *grpcComponent {
 	once.Do(func() {
 		component = &grpcComponent{
-			config:  map[string]*grpcConfig{},
-			conns:   make(map[string]*grpc.ClientConn),
-			options: make(map[string][]grpc.DialOption),
+			config:             map[string]*grpcConfig{},
+			conns:              make(map[string]*grpc.ClientConn),
+			options:            make(map[string][]grpc.DialOption),
+			unaryInterceptors:  make(map[string][]grpc.UnaryClientInterceptor),
+			streamInterceptors: make(map[string][]grpc.StreamClientInterceptor),
 		}
 	})
 	return component
