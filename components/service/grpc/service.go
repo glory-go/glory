@@ -31,9 +31,11 @@ var (
 func getGRPCService() *grpcService {
 	once.Do(func() {
 		srv = &grpcService{
-			configs: make(map[string]*grpcServiceConfig),
-			servers: make(map[string]*grpc.Server),
-			options: make(map[string][]grpc.ServerOption),
+			configs:            make(map[string]*grpcServiceConfig),
+			servers:            make(map[string]*grpc.Server),
+			options:            make(map[string][]grpc.ServerOption),
+			unaryInterceptors:  make(map[string][]grpc.UnaryServerInterceptor),
+			streamInterceptors: make(map[string][]grpc.StreamServerInterceptor),
 		}
 	})
 
