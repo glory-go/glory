@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"log"
 	"net"
 	"sync"
 
@@ -96,6 +97,7 @@ func (s *grpcService) Run() error {
 			if err != nil {
 				return err
 			}
+			log.Printf("grpc service %s listening at %s\n", name, lis.Addr().String())
 			return s.servers[name].Serve(lis)
 		})
 	}
