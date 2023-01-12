@@ -1,7 +1,9 @@
 package service
 
 import (
-	"fmt"
+	"log"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 func (s *serviceComponent) RegisterService(srv Service) {
@@ -9,10 +11,21 @@ func (s *serviceComponent) RegisterService(srv Service) {
 		panic("register nil service")
 	}
 	register()
-	_, ok := s.serviceRegistry.LoadOrStore(srv.Name(), srv)
-	if ok {
-		panic(fmt.Sprintf("service [%s] already register before", srv.Name()))
+	raw, ok := rawConf[srv.Name()]
+	if !ok {
+		log.Printf("config of service %s not found", srv.Name())
+		return
 	}
+	// 将配置转为map[string]any形式
+	srvConfig := make(map[string]any)
+	if err := mapstructure.Decode(raw, &srvConfig); err != nil {
+		panic(err)
+	}
+	// 调用服务本身的初始化方法完成初始化
+	if err := srv.Init(srvConfig); err != nil {
+		panic(err)
+	}
+	s.serviceRegistry.Store(srv.Name(), srv)
 }
 
 func (s *serviceComponent) iterServiceRegistry(f func(name string, srv Service) error) error {

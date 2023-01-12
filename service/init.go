@@ -12,7 +12,6 @@ var (
 
 func register() {
 	registerOnce.Do(func() {
-		config.Init()
 		config.RegisterComponent(GetService())
 	})
 }
@@ -20,9 +19,6 @@ func register() {
 func (s *serviceComponent) Run() {
 	wg := sync.WaitGroup{}
 	s.iterServiceRegistry(func(name string, srv Service) error {
-		if !s.inited.Contains(name) { // 未初始化的服务不调用Run方法
-			return nil
-		}
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

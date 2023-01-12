@@ -1,16 +1,31 @@
 package sub
 
-import "fmt"
+import (
+	"log"
 
-func (s *subSrv) RegisterSubProvider(srv SubProvider) {
-	if srv == nil {
+	"github.com/mitchellh/mapstructure"
+)
+
+func (s *subSrv) RegisterSubProvider(provider SubProvider) {
+	if provider == nil {
 		panic("register nil provider")
 	}
 	register()
-	_, ok := s.subProviderRegistry.LoadOrStore(srv.Name(), srv)
-	if ok {
-		panic(fmt.Sprintf("provider [%s] already register before", srv.Name()))
+	raw, ok := rawConf[provider.Name()]
+	if !ok {
+		log.Printf("config of sub %s not found", provider.Name())
+		return
 	}
+	// 将配置转为map[string]any形式
+	providerConfig := make(map[string]any)
+	if err := mapstructure.Decode(raw, &providerConfig); err != nil {
+		panic(err)
+	}
+	// 调用服务本身的初始化方法完成初始化
+	if err := provider.Init(providerConfig); err != nil {
+		panic(err)
+	}
+	s.subProviderRegistry.Store(provider.Name(), provider)
 }
 
 func (s *subSrv) iterSubProviderRegistry(f func(name string, provider SubProvider) error) error {
