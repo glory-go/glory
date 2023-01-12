@@ -63,6 +63,7 @@ func WithStreamInterceptors(name string, incs ...grpc.StreamServerInterceptor) {
 }
 
 func GetServer(name string) *grpc.Server {
+	register()
 	return getGRPCService().servers[name]
 }
 

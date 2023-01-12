@@ -32,6 +32,7 @@ func getRedisComponent() *redisComponent {
 }
 
 func GetRedisClient(name string) *redis.Client {
+	register()
 	return getRedisComponent().clients[name]
 }
 

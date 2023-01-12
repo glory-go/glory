@@ -8,6 +8,7 @@ func (s *serviceComponent) RegisterService(srv Service) {
 	if srv == nil {
 		panic("register nil service")
 	}
+	register()
 	_, ok := s.serviceRegistry.LoadOrStore(srv.Name(), srv)
 	if ok {
 		panic(fmt.Sprintf("service [%s] already register before", srv.Name()))

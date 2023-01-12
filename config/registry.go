@@ -3,8 +3,6 @@ package config
 import (
 	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -61,17 +59,12 @@ func RegisterComponent(component Component) {
 	if keepedComponentName.Contains(component.Name()) {
 		panic(fmt.Sprintf("component name [%s] was kept by glory", component.Name()))
 	}
-	_, ok := componentRegistry.LoadOrStore(component.Name(), component)
-	if ok {
-		panic(fmt.Sprintf("component [%s] already register before", component.Name()))
+	// 初始化配置中心，确保配置内容完成了解析
+	Init()
+	componentRegistry.Store(component.Name(), component)
+	rawConfig := make(map[string]any)
+	getConfig(component.Name(), &rawConfig)
+	if err := component.Init(rawConfig); err != nil {
+		panic(err)
 	}
-}
-
-func iterComponentRegistry(f func(name string, component Component) error) {
-	componentRegistry.Range(func(key, value any) bool {
-		if err := f(key.(string), value.(Component)); err != nil {
-			panic(errors.WithMessagef(err, "fail to iter component %s", key))
-		}
-		return true
-	})
 }

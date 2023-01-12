@@ -35,6 +35,7 @@ func GetPostgresGormComponent() *postgresGormComponent {
 }
 
 func (g *postgresGormComponent) GetDB(name string) *gorm.DB {
+	register()
 	return g.dbs[name]
 }
 

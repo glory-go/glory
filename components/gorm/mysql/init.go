@@ -1,7 +1,17 @@
 package mysql
 
-import "github.com/glory-go/glory/v2/config"
+import (
+	"sync"
 
-func init() {
-	config.RegisterComponent(GetMysqlGormComponent())
+	"github.com/glory-go/glory/v2/config"
+)
+
+var (
+	registerOnce sync.Once
+)
+
+func register() {
+	registerOnce.Do(func() {
+		config.RegisterComponent(GetMysqlGormComponent())
+	})
 }

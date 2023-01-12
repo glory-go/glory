@@ -34,6 +34,7 @@ func GetSqliteGormComponent() *sqliteGormComponent {
 }
 
 func (g *sqliteGormComponent) GetDB(name string) *gorm.DB {
+	register()
 	return g.dbs[name]
 }
 

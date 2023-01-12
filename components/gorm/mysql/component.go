@@ -35,6 +35,7 @@ func GetMysqlGormComponent() *mysqlGormComponent {
 }
 
 func (g *mysqlGormComponent) GetDB(name string) *gorm.DB {
+	register()
 	return g.dbs[name]
 }
 

@@ -37,6 +37,7 @@ func getGinHttpService() *ginHttpService {
 }
 
 func GetEngine(name string) *gin.Engine {
+	register()
 	return getGinHttpService().routers[name]
 }
 

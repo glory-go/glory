@@ -1,7 +1,17 @@
 package ginhttp
 
-import "github.com/glory-go/glory/v2/service"
+import (
+	"sync"
 
-func init() {
-	service.GetService().RegisterService(getGinHttpService())
+	"github.com/glory-go/glory/v2/service"
+)
+
+var (
+	registerOnce sync.Once
+)
+
+func register() {
+	registerOnce.Do(func() {
+		service.GetService().RegisterService(getGinHttpService())
+	})
 }

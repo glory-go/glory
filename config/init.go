@@ -11,10 +11,6 @@ var (
 	initOnce sync.Once
 )
 
-func init() {
-	registerInnerConfigCenter(GetEnvConfigCenter())
-}
-
 func Init() {
 	initOnce.Do(func() {
 		defer func() {
@@ -30,6 +26,7 @@ func Init() {
 		}
 		loadRawConfig(file)
 		// 替换环境变量中的内容
+		registerInnerConfigCenter(GetEnvConfigCenter())
 		convertConfigFromEnv()
 		/* 初始化原始文件配置结束 */
 
@@ -55,16 +52,5 @@ func Init() {
 
 		// 基于配置中心更新配置文件内容
 		convertConfigFromConfigCenter()
-
-		/* 初始化用户注册的组件 */
-		iterComponentRegistry(func(name string, component Component) error {
-			rawConfig := make(map[string]any)
-			getConfig(name, &rawConfig)
-			if err := component.Init(rawConfig); err != nil {
-				return err
-			}
-			return nil
-		})
-		/* 初始化组件结束 */
 	})
 }

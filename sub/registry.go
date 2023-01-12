@@ -6,6 +6,7 @@ func (s *subSrv) RegisterSubProvider(srv SubProvider) {
 	if srv == nil {
 		panic("register nil provider")
 	}
+	register()
 	_, ok := s.subProviderRegistry.LoadOrStore(srv.Name(), srv)
 	if ok {
 		panic(fmt.Sprintf("provider [%s] already register before", srv.Name()))

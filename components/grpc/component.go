@@ -60,6 +60,7 @@ func WithStreamInterceptors(name string, incs ...grpc.StreamClientInterceptor) {
 }
 
 func GetGRPCClient(name string) *grpc.ClientConn {
+	register()
 	return getGrpcComponent().conns[name]
 }
 

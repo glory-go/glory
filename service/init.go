@@ -6,8 +6,15 @@ import (
 	"github.com/glory-go/glory/v2/config"
 )
 
-func init() {
-	config.RegisterComponent(GetService())
+var (
+	registerOnce sync.Once
+)
+
+func register() {
+	registerOnce.Do(func() {
+		config.Init()
+		config.RegisterComponent(GetService())
+	})
 }
 
 func (s *serviceComponent) Run() {
