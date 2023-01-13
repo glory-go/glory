@@ -7,6 +7,7 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/mitchellh/mapstructure"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
@@ -86,6 +87,13 @@ func (c *grpcComponent) Init(config map[string]any) error {
 			grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(streamInterceptors...)),
 			grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryInterceptors...)),
 		)
+		if conf.TLS {
+			cred, err := credentials.NewClientTLSFromFile(conf.CertPath, conf.ServerNameOverride)
+			if err != nil {
+				return fmt.Errorf("grpcComponent/Init: error on creating tls creds %s", err)
+			}
+			options = append(options, grpc.WithTransportCredentials(cred))
+		}
 		conn, err := grpc.Dial(fmt.Sprintf("%s:%d", conf.Host, conf.Port), options...)
 		if err != nil {
 			return err

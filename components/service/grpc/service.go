@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"sync"
@@ -9,6 +10,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -85,6 +87,13 @@ func (s *grpcService) Init(config map[string]interface{}) error {
 			grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(streamInterceptors...)),
 			grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(unaryInterceptors...)),
 		)
+		if conf.TLS {
+			creds, err := credentials.NewServerTLSFromFile(conf.CertFile, conf.KeyFile)
+			if err != nil {
+				return fmt.Errorf("grpcService/Init: failed to create server TLS creds, %s", err)
+			}
+			options = append(options, grpc.Creds(creds))
+		}
 		s.servers[k] = grpc.NewServer(options...)
 	}
 	return nil
