@@ -1,6 +1,7 @@
 package grpc
 
 import (
+	"crypto/tls"
 	"fmt"
 	"sync"
 
@@ -88,9 +89,17 @@ func (c *grpcComponent) Init(config map[string]any) error {
 			grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(unaryInterceptors...)),
 		)
 		if conf.TLS {
-			cred, err := credentials.NewClientTLSFromFile(conf.CertPath, conf.ServerNameOverride)
-			if err != nil {
-				return fmt.Errorf("grpcComponent/Init: error on creating tls creds %s", err)
+			var cred credentials.TransportCredentials
+			if conf.InsecureSkipVerify {
+				cred = credentials.NewTLS(&tls.Config{
+					InsecureSkipVerify: true,
+				})
+			} else {
+				var err error
+				cred, err = credentials.NewClientTLSFromFile(conf.CertPath, conf.ServerNameOverride)
+				if err != nil {
+					return fmt.Errorf("grpcComponent/Init: error on creating tls creds %s", err)
+				}
 			}
 			options = append(options, grpc.WithTransportCredentials(cred))
 		}

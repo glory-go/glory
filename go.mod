@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/alicebob/miniredis/v2 v2.30.0
-	github.com/aliyun/fc-runtime-go-sdk v0.2.7
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
